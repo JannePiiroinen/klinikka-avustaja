@@ -1,0 +1,41 @@
+"""Kysy agentilta komentoriviltä.
+
+Aja:  uv run python -m klinikka.ask "Paljonko maksaa perusverenkuva?"
+      uv run python -m klinikka.ask            (interaktiivinen tila)
+"""
+
+from __future__ import annotations
+
+import sys
+
+from klinikka.agent import answer, build_agent, build_azure_model
+from klinikka.config import Settings
+from klinikka.retrieval import AzureEmbedder, Retriever
+
+
+def main() -> None:
+    settings = Settings.from_env()
+    retriever = Retriever(AzureEmbedder(settings))
+    agent = build_agent(build_azure_model())
+
+    questions = [" ".join(sys.argv[1:])] if len(sys.argv) > 1 else None
+    while True:
+        question = questions.pop() if questions else input("\nKysymys (tyhjä lopettaa): ").strip()
+        if not question:
+            break
+        r = answer(agent, retriever, question)
+        cost = settings.cost_usd(r.input_tokens, r.output_tokens)
+        print(f"\n{r.output.vastaus}")
+        print(f"\n  tyyppi: {r.output.tyyppi}")
+        print(f"  lähteet (malli): {', '.join(r.output.lahteet) or '-'}")
+        print(f"  haetut dokumentit: {', '.join(r.retrieved_sources) or '-'}")
+        print(
+            f"  {r.latency_s:.2f} s | {r.requests} mallikutsua | "
+            f"{r.input_tokens}+{r.output_tokens} tokenia | {cost * 100:.4f} senttiä"
+        )
+        if questions is not None:
+            break
+
+
+if __name__ == "__main__":
+    main()

@@ -7,7 +7,7 @@ Tekoälyagentti kuvitteellisen lääkäriaseman asiakaspalveluun. Projektin pain
 ## Tavoitteet (työn alla)
 
 - [x] Projektirunko, asetukset ja synteettinen tietopohja (12 dokumenttia)
-- [ ] RAG-agentti ja työkalukutsut (PydanticAI, Azure OpenAI / AI Foundry)
+- [x] RAG-agentti ja työkalukutsut (PydanticAI, Azure OpenAI / AI Foundry, Chroma)
 - [ ] Guardrailit: henkilötunnusten ja yhteystietojen poisto, diagnoosipyyntöjen rajaus, lähteisiin perustuvat vastaukset
 - [ ] Tracing ja kustannusseuranta (MLflow)
 - [ ] Evaluointi: oikeellisuus, lähteisiin pohjautuminen, kieltäytymisten osuvuus, viive, kustannus
@@ -20,8 +20,27 @@ Tekoälyagentti kuvitteellisen lääkäriaseman asiakaspalveluun. Projektin pain
 uv sync
 cp .env.example .env   # täytä Azure AI Foundryn tiedot
 uv run python scripts/check_azure.py
+uv run python -m klinikka.ingest          # indeksoi tietopohjan Chromaan
+uv run python -m klinikka.ask "Paljonko perusverenkuva maksaa?"
 uv run pytest
 ```
+
+## Arkkitehtuuri
+
+```
+Kysymys ──► PydanticAI-agentti ──► työkalu: hae_ohjeista ──► Chroma (upotukset: text-embedding-3-small)
+               │                └► työkalu: tarkista_vapaat_ajat (simuloitu ajanvaraus)
+               ▼
+        Rakenteinen vastaus { vastaus, tyyppi, lahteet }   ← mitattavissa evaluoinnissa
+```
+
+- **Pilkkominen otsikoittain:** jokainen `##`-osio on oma palansa, ja siihen liitetään dokumentin pääotsikko. Haettu pala on ymmärrettävä yksinään, ja lähdeviite osoittaa oikeaan kohtaan.
+- **Rakenteinen vastaus:** `tyyppi` (vastattu / ei_tietoa / ohjattu_ammattilaiselle / hatatilanne) ja `lahteet` mahdollistavat kieltäytymisten ja lähteiden automaattisen evaluoinnin.
+- **Testattavuus:** upotusmalli on rajapinnan takana, joten testit ajetaan paikallisella korvaajalla ja PydanticAI:n TestModelilla ilman API-kutsuja.
+
+## Datan sijainti
+
+Demo käyttää Switzerland North -aluetta Azure for Students -tilauksen aluerajoitusten vuoksi. Aineisto on synteettistä. Tuotannossa potilasdataa käsittelevä ratkaisu ajettaisiin EU-alueella Data Zone EU- tai alueellisella käyttöönotolla.
 
 ## Rakenne
 
