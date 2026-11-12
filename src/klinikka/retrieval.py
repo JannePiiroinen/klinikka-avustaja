@@ -1,4 +1,9 @@
-"""Upotukset ja vektorihaku (Chroma).
+"""Hybridihaku: vektorihaku (Chroma) + avainsanahaku (BM25), yhdistetty RRF:llä.
+
+Vektorihaku löytää merkitykseltään samankaltaiset kohdat ("paljonko maksaa" ~ "hinnasto"),
+mutta voi ohittaa lyhyen sivumaininnan pitkän kappaleen keskellä. Avainsanahaku löytää
+tarkat termit ("laboratorio", "kerroksessa"). Tulokset yhdistetään Reciprocal Rank
+Fusionilla, joka ei vaadi pisteiden skaalausta.
 
 Upotusmalli on rajapinnan (Embedder) takana, joten testit voivat käyttää
 paikallista korvaajaa ilman API-kutsuja, ja Azuren voi vaihtaa toiseen
@@ -7,6 +12,9 @@ tarjoajaan muuttamatta hakulogiikkaa.
 
 from __future__ import annotations
 
+import math
+import re
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -48,7 +56,45 @@ class SearchHit:
     source: str
     label: str
     text: str
-    distance: float
+    score: float  # RRF-pisteet: suurempi = osuvampi
+
+
+def tokenize(text: str, stem_len: int = 5) -> list[str]:
+    """Kevyt suomen "typistys": sanat katkaistaan viiteen merkkiin, jolloin taivutusmuodot
+    osuvat yhteen (laboratorio / laboratorion -> "labor", kerros / kerroksessa -> "kerro")."""
+    return [w[:stem_len] for w in re.findall(r"\w+", text.lower()) if len(w) > 1]
+
+
+class BM25:
+    def __init__(self, docs: list[str], k1: float = 1.5, b: float = 0.75):
+        self.k1, self.b = k1, b
+        self.docs = [Counter(tokenize(d)) for d in docs]
+        self.lengths = [sum(c.values()) for c in self.docs]
+        self.avg_len = (sum(self.lengths) / len(self.lengths)) if self.lengths else 0.0
+        df = Counter(term for doc in self.docs for term in doc)
+        n = len(self.docs)
+        self.idf = {t: math.log(1 + (n - f + 0.5) / (f + 0.5)) for t, f in df.items()}
+
+    def scores(self, query: str) -> list[float]:
+        terms = tokenize(query)
+        result = []
+        for doc, length in zip(self.docs, self.lengths, strict=True):
+            score = 0.0
+            for t in terms:
+                if t in doc:
+                    tf = doc[t]
+                    norm = tf + self.k1 * (1 - self.b + self.b * length / self.avg_len)
+                    score += self.idf[t] * tf * (self.k1 + 1) / norm
+            result.append(score)
+        return result
+
+
+def reciprocal_rank_fusion(rankings: list[list[str]], k: int = 60) -> dict[str, float]:
+    fused: dict[str, float] = {}
+    for ranking in rankings:
+        for rank, item in enumerate(ranking):
+            fused[item] = fused.get(item, 0.0) + 1.0 / (k + rank + 1)
+    return fused
 
 
 class Retriever:
@@ -58,6 +104,14 @@ class Retriever:
         self._collection = self._client.get_or_create_collection(
             COLLECTION, embedding_function=None, metadata={"hnsw:space": "cosine"}
         )
+        self._load_lexical_index()
+
+    def _load_lexical_index(self) -> None:
+        data = self._collection.get(include=["documents", "metadatas"])
+        self._ids: list[str] = data["ids"]
+        self._docs = {cid: doc for cid, doc in zip(data["ids"], data["documents"], strict=True)}
+        self._metas = {cid: m for cid, m in zip(data["ids"], data["metadatas"], strict=True)}
+        self._bm25 = BM25([self._docs[cid] for cid in self._ids])
 
     def count(self) -> int:
         return self._collection.count()
@@ -74,24 +128,30 @@ class Retriever:
             documents=[c.text for c in chunks],
             metadatas=[{"source": c.source, "label": c.label} for c in chunks],
         )
+        self._load_lexical_index()
 
-    def search(self, query: str, k: int = 6) -> list[SearchHit]:
+    def search(self, query: str, k: int = 6, candidates: int = 20) -> list[SearchHit]:
         if self.count() == 0:
             raise RuntimeError("Hakuindeksi on tyhjä. Aja ensin: uv run python -m klinikka.ingest")
-        res = self._collection.query(query_embeddings=self._embedder.embed([query]), n_results=k)
+        n = min(candidates, self.count())
+        vector = self._collection.query(
+            query_embeddings=self._embedder.embed([query]), n_results=n
+        )["ids"][0]
+        bm25_scores = self._bm25.scores(query)
+        lexical = [
+            cid
+            for cid, score in sorted(zip(self._ids, bm25_scores, strict=True), key=lambda x: -x[1])
+            if score > 0
+        ][:n]
+        fused = reciprocal_rank_fusion([vector, lexical])
+        top = sorted(fused.items(), key=lambda x: -x[1])[:k]
         return [
             SearchHit(
                 chunk_id=cid,
-                source=meta["source"],
-                label=meta["label"],
-                text=doc,
-                distance=dist,
+                source=self._metas[cid]["source"],
+                label=self._metas[cid]["label"],
+                text=self._docs[cid],
+                score=score,
             )
-            for cid, doc, meta, dist in zip(
-                res["ids"][0],
-                res["documents"][0],
-                res["metadatas"][0],
-                res["distances"][0],
-                strict=True,
-            )
+            for cid, score in top
         ]

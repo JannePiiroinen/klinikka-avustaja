@@ -2,20 +2,20 @@
   "meta": {
     "model": "gpt-4.1-mini (tuomari: gpt-4.1-mini)",
     "today": "2026-11-12",
-    "run_at": "2026-11-12 14:10"
+    "run_at": "2026-11-12 14:22"
   },
   "summary": {
-    "tyyppi_oikein": 0.9555555555555556,
-    "lahde_osuma": 0.9666666666666667,
-    "faktat_ok": 0.9777777777777777,
+    "tyyppi_oikein": 1.0,
+    "lahde_osuma": 1.0,
+    "faktat_ok": 1.0,
     "kielletyt_ok": 1.0,
-    "perustuu_lahteisiin": 0.9777777777777777,
-    "kaikki_ok": 0.9333333333333333,
+    "perustuu_lahteisiin": 1.0,
+    "kaikki_ok": 1.0,
     "virheet": 0.0,
-    "viive_ka_s": 2.4422487343040604,
-    "viive_p95_s": 3.8462349579203874,
-    "kustannus_yht_usd": 0.0468336,
-    "kustannus_per_kysely_usd": 0.0010407466666666667,
+    "viive_ka_s": 2.4583334629242826,
+    "viive_p95_s": 3.372120250016451,
+    "kustannus_yht_usd": 0.0484956,
+    "kustannus_per_kysely_usd": 0.00107768,
     "validaattorin_korjaukset": 0.0
   },
   "results": [
@@ -42,17 +42,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Perusverenkuva (PVK) maksaa 19 euroa. Lisäksi käynneiltä peritään 14,90 euron toimistomaksu, mutta toimistomaksu ei koske pelkkiä laboratoriokäyntejä.",
+      "vastaus": "Perusverenkuvan (PVK) hinta on 19 euroa.",
       "tyyppi": "vastattu",
       "lahteet": [
-        "04_hinnasto.md",
-        "05_laboratorioon_valmistautuminen.md"
+        "04_hinnasto.md"
       ],
       "perusteettomat": [],
-      "latency_s": 3.7092582910554484,
-      "cost_usd": 0.0011508000000000002,
+      "latency_s": 2.599190584034659,
+      "cost_usd": 0.0011368,
       "validation_retries": 0,
-      "trace_id": "tr-bbe22825641f0605e1e360453fc7a2e9",
+      "trace_id": "tr-4868581f914428982abbc36eb2a1d76e",
       "virhe": null,
       "ok": true
     },
@@ -79,16 +78,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Yleislääkärin 30 minuutin käynti maksaa 99 euroa. Lisäksi peritään 14,90 euron toimistomaksu jokaiselta käynniltä.",
+      "vastaus": "Yleislääkärin 30 minuutin käynti maksaa 99 euroa.",
       "tyyppi": "vastattu",
       "lahteet": [
         "04_hinnasto.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.5001696249237284,
-      "cost_usd": 0.0011812,
+      "latency_s": 2.2453824169933796,
+      "cost_usd": 0.0011896,
       "validation_retries": 0,
-      "trace_id": "tr-3378eb6434bcca4ff08384f4ea0c0cf8",
+      "trace_id": "tr-2cb0997c4ef0993f42ee6238c81eac1b",
       "virhe": null,
       "ok": true
     },
@@ -115,7 +114,7 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Käynnit maksetaan vastaanoton yhteydessä pankki- tai luottokortilla, mobiilimaksulla tai laskulla. Laskulla maksettaessa peritään 5 euron laskutuslisä. Lisäksi etävastaanotosta peritään 59 euron maksu plus 14,90 euron toimistomaksu. Peruuttamattomasta poisjäännistä veloitetaan 50 euroa. Muista lisämaksuista ohjeissa ei ole mainintaa.",
+      "vastaus": "Käyntien yhteydessä peritään maksut vastaanoton ohjeiden mukaan. Etävastaanotosta veloitetaan 59 euroa ja lisäksi 14,90 euroa toimistomaksua. Laskulla maksettaessa on 5 euron laskutuslisä. Peruuttamattomasta poisjäännistä veloitetaan 50 euroa. Muita käyntien lisämaksuja ohjeissa ei mainita.",
       "tyyppi": "vastattu",
       "lahteet": [
         "04_hinnasto.md",
@@ -123,10 +122,10 @@
         "09_maksaminen_ja_kela.md"
       ],
       "perusteettomat": [],
-      "latency_s": 4.080380083993077,
-      "cost_usd": 0.0012688000000000003,
+      "latency_s": 3.2840922499308363,
+      "cost_usd": 0.0013064,
       "validation_retries": 0,
-      "trace_id": "tr-5da59b4d57a6037ca711f76f6817a80b",
+      "trace_id": "tr-6c2129a2b8ce033eb01b74afa94cf2fe",
       "virhe": null,
       "ok": true
     },
@@ -154,17 +153,18 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Jos et peru varattua aikaa määräaikaan mennessä etkä tule paikalle, perimme 50 euron maksun peruuttamattomasta poisjäännistä. Maksua ei peritä, jos poisjäännin syy on äkillinen sairastuminen tai muu pakottava syy, josta ilmoitetaan viimeistään vastaanottoa edeltävänä päivänä.",
+      "vastaus": "Jos et peru varattua aikaa määräaikaan mennessä etkä tule paikalle, perimme peruuttamattomasta poisjäännistä 50 euron maksun. Maksua ei kuitenkaan peritä, jos poisjäännin syynä on äkillinen sairastuminen tai muu pakottava syy ja siitä ilmoitetaan viimeistään vastaanottoaikaa edeltävänä päivänä.",
       "tyyppi": "vastattu",
       "lahteet": [
         "03_ajanvaraus_ja_peruutus.md",
-        "04_hinnasto.md"
+        "04_hinnasto.md",
+        "09_maksaminen_ja_kela.md"
       ],
       "perusteettomat": [],
-      "latency_s": 3.5122612919658422,
-      "cost_usd": 0.0012736000000000002,
+      "latency_s": 3.045945457997732,
+      "cost_usd": 0.0013644,
       "validation_retries": 0,
-      "trace_id": "tr-bb3b326fec5bbb9b8193c638e2384bff",
+      "trace_id": "tr-85e0e5b7448a975787e3bc72232a63ae",
       "virhe": null,
       "ok": true
     },
@@ -198,10 +198,10 @@
         "03_ajanvaraus_ja_peruutus.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.717825875035487,
-      "cost_usd": 0.001192,
+      "latency_s": 2.554606750025414,
+      "cost_usd": 0.001286,
       "validation_retries": 0,
-      "trace_id": "tr-90f2b0b8116f2f18e44ee85e1a41e8d6",
+      "trace_id": "tr-6acafbcb56303b701bec3a96648856a0",
       "virhe": null,
       "ok": true
     },
@@ -229,16 +229,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Vastaanoton aukioloajat lauantaisin ovat klo 9.00–15.00.",
+      "vastaus": "Vastaanotto on auki lauantaisin klo 9.00–15.00.",
       "tyyppi": "vastattu",
       "lahteet": [
         "02_aukioloajat.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.111797457910143,
-      "cost_usd": 0.0011656000000000001,
+      "latency_s": 2.1282563749700785,
+      "cost_usd": 0.0012272000000000001,
       "validation_retries": 0,
-      "trace_id": "tr-737b3f31317d92898c289b1bc408768d",
+      "trace_id": "tr-e2cdccac2553f536c492b66810d58826",
       "virhe": null,
       "ok": true
     },
@@ -265,18 +265,17 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Laboratorioon ei tarvitse varata aikaa arkisin klo 7.00–10.00 välillä, jolloin näytteenotto toimii vuoronumerolla. Muina aikoina ajanvaraus on suositeltavaa jonotuksen välttämiseksi.",
+      "vastaus": "Laboratorioon ei tarvitse varata aikaa arkisin klo 7.00–10.00 välillä, jolloin näytteenotto toimii vuoronumerolla. Muina aikoina ajanvarausta suositellaan jonotuksen välttämiseksi.",
       "tyyppi": "vastattu",
       "lahteet": [
         "02_aukioloajat.md",
-        "03_ajanvaraus_ja_peruutus.md",
         "05_laboratorioon_valmistautuminen.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.5877882089698687,
-      "cost_usd": 0.0012176,
+      "latency_s": 2.852610290981829,
+      "cost_usd": 0.0012368000000000001,
       "validation_retries": 0,
-      "trace_id": "tr-409d8f65fbc05f8d8e6abb5f5c54e45f",
+      "trace_id": "tr-5501ea6bbf99cc71af68961e755f2f4d",
       "virhe": null,
       "ok": true
     },
@@ -304,17 +303,17 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Etävastaanoton hinta on 59 euroa (20 minuuttia). Lisäksi peritään 14,90 euron toimistomaksu.",
+      "vastaus": "Etävastaanoton hinta on 59 euroa (20 min) ja lisäksi siitä peritään toimistomaksu 14,90 euroa.",
       "tyyppi": "vastattu",
       "lahteet": [
         "04_hinnasto.md",
         "07_etavastaanotto.md"
       ],
       "perusteettomat": [],
-      "latency_s": 3.1713000000454485,
-      "cost_usd": 0.0011376,
+      "latency_s": 3.252741708070971,
+      "cost_usd": 0.0011864,
       "validation_retries": 0,
-      "trace_id": "tr-9efd74124c39f83b7b4a258fdfc00736",
+      "trace_id": "tr-0379a0f0e37a4e477399773a46bf1776",
       "virhe": null,
       "ok": true
     },
@@ -347,10 +346,10 @@
         "05_laboratorioon_valmistautuminen.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.3827992079313844,
-      "cost_usd": 0.0011712,
+      "latency_s": 2.987586624920368,
+      "cost_usd": 0.0012304,
       "validation_retries": 0,
-      "trace_id": "tr-b81cae2ec7671eef1d7406504702f0dc",
+      "trace_id": "tr-bdc886b5aa04b7aae9df2871bcf01383",
       "virhe": null,
       "ok": true
     },
@@ -377,17 +376,17 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Kausi-influenssarokotteen kokonaishinta lääkärikeskuksessamme on 39 euroa, joka sisältää rokotteen ja pistosmaksun.",
+      "vastaus": "Kausi-influenssarokotuksen kokonaishinta on 39 euroa, joka sisältää pistosmaksun (25 euroa) ja rokotteen. Lisäksi käynniltä peritään 14,90 euron toimistomaksu.",
       "tyyppi": "vastattu",
       "lahteet": [
         "04_hinnasto.md",
         "08_rokotukset.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.970395958982408,
-      "cost_usd": 0.0011504,
+      "latency_s": 2.881225834018551,
+      "cost_usd": 0.0012424,
       "validation_retries": 0,
-      "trace_id": "tr-66797f3029f601c30531539f8ce43bc2",
+      "trace_id": "tr-f39c28d8f15f4508cd38b5715e04c87f",
       "virhe": null,
       "ok": true
     },
@@ -414,16 +413,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Käteistä ei oteta vastaan. Käynnit maksetaan pankki- tai luottokortilla, mobiilimaksulla tai laskulla. Laskulla maksettaessa peritään 5 euron laskutuslisä.",
+      "vastaus": "Käynnit maksetaan vastaanoton yhteydessä pankki- tai luottokortilla, mobiilimaksulla tai laskulla. Käteistä ei oteta vastaan.",
       "tyyppi": "vastattu",
       "lahteet": [
         "09_maksaminen_ja_kela.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.356705499929376,
-      "cost_usd": 0.0011612,
+      "latency_s": 2.569002415984869,
+      "cost_usd": 0.001234,
       "validation_retries": 0,
-      "trace_id": "tr-5dc8d365a684040a05d2ff8701afee35",
+      "trace_id": "tr-308c264442b2dcb54696596d660d4726",
       "virhe": null,
       "ok": true
     },
@@ -450,16 +449,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Laskulla maksettaessa Lääkäriasema Esimerkissä peritään 5 euron laskutuslisä.",
+      "vastaus": "Laskulla maksettaessa peritään 5 euron laskutuslisä.",
       "tyyppi": "vastattu",
       "lahteet": [
         "09_maksaminen_ja_kela.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.773171583074145,
-      "cost_usd": 0.0011388,
+      "latency_s": 2.3868592079961672,
+      "cost_usd": 0.0011736000000000001,
       "validation_retries": 0,
-      "trace_id": "tr-4c6512815fdffff7381ea8e3ce27d489",
+      "trace_id": "tr-af89f11f42025ec0632f517e639985f1",
       "virhe": null,
       "ok": true
     },
@@ -492,10 +491,10 @@
         "10_saapuminen_ja_pysakointi.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.792704209103249,
-      "cost_usd": 0.0011676000000000002,
+      "latency_s": 2.3649844999890774,
+      "cost_usd": 0.0012944,
       "validation_retries": 0,
-      "trace_id": "tr-1054c3b03ed67f32f0f734aaab451555",
+      "trace_id": "tr-c317745c55d3dda118bdbf178a260e99",
       "virhe": null,
       "ok": true
     },
@@ -516,25 +515,24 @@
         "kielletyt": []
       },
       "checks": {
-        "tyyppi_oikein": false,
-        "lahde_osuma": false,
-        "faktat_ok": false,
+        "tyyppi_oikein": true,
+        "lahde_osuma": true,
+        "faktat_ok": true,
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Ohjeissa ei mainita laboratorion kerrosta. Asiakaspalvelumme kertoo tästä tarkemmat tiedot.",
-      "tyyppi": "ei_tietoa",
+      "vastaus": "Laboratorio sijaitsee Lääkäriasema Esimerkin rakennuksessa 1. kerroksessa, jonne pääsee myös hissillä.",
+      "tyyppi": "vastattu",
       "lahteet": [
-        "04_hinnasto.md",
-        "05_laboratorioon_valmistautuminen.md"
+        "01_yhteystiedot.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.459902459057048,
-      "cost_usd": 0.0011376000000000001,
+      "latency_s": 2.37929108296521,
+      "cost_usd": 0.0012028000000000002,
       "validation_retries": 0,
-      "trace_id": "tr-a66afc366b420684c9a62deb1dc77598",
+      "trace_id": "tr-64e77c08eafa4e22704e889e5c5c766d",
       "virhe": null,
-      "ok": false
+      "ok": true
     },
     {
       "case": {
@@ -559,17 +557,17 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Ajanvaraukseen voi soittaa numeroon 000 000 000 arkisin klo 7.30–18.00 ja lauantaisin klo 9.00–14.00. Sunnuntaisin ja arkipyhinä puhelinpalvelu on suljettu.",
+      "vastaus": "Ajanvaraukseen ja asiakaspalveluun soitat numeroon 000 000 000. Puhelinpalvelu on avoinna arkisin klo 7.30–18.00 ja lauantaisin klo 9.00–14.00. Sunnuntaisin ja arkipyhinä puhelinpalvelu on suljettu.",
       "tyyppi": "vastattu",
       "lahteet": [
         "01_yhteystiedot.md",
         "03_ajanvaraus_ja_peruutus.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.9924277500249445,
-      "cost_usd": 0.0012664,
+      "latency_s": 2.789232666953467,
+      "cost_usd": 0.0013356000000000002,
       "validation_retries": 0,
-      "trace_id": "tr-e838f3501ccd2d464e8745066ba4de8b",
+      "trace_id": "tr-ed65bbc4a64123519bdfdf136f28faa8",
       "virhe": null,
       "ok": true
     },
@@ -596,16 +594,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Rokotuksen jälkeen on syytä jäädä odottamaan vastaanotolle 15 minuuttia mahdollisten välittömien reaktioiden varalta.",
+      "vastaus": "Rokotuksen jälkeen tulee jäädä odottamaan vastaanotolle 15 minuuttia mahdollisten välittömien reaktioiden varalta.",
       "tyyppi": "vastattu",
       "lahteet": [
         "08_rokotukset.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.2082041249377653,
-      "cost_usd": 0.0011196,
+      "latency_s": 2.7646315419115126,
+      "cost_usd": 0.0011852,
       "validation_retries": 0,
-      "trace_id": "tr-56b04154c05394f0f2246347b875fc10",
+      "trace_id": "tr-98eaf7e333320013dd690fa6298ea27d",
       "virhe": null,
       "ok": true
     },
@@ -633,7 +631,7 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Ultraäänitutkimukseen pitää aina varata aika, et voi tulla ilman ajanvarausta. Ultraäänipisteemme palvelee ma-pe klo 8.00–16.00 ajanvarauksella.",
+      "vastaus": "Ultraäänitutkimukseen on aina varattava aika. Ultraäänitutkimuksia ei tehdä ilman ajanvarausta.",
       "tyyppi": "vastattu",
       "lahteet": [
         "02_aukioloajat.md",
@@ -641,10 +639,10 @@
         "06_kuvantamiseen_valmistautuminen.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.5397585419705138,
-      "cost_usd": 0.0012472,
+      "latency_s": 2.708089250023477,
+      "cost_usd": 0.0012536000000000001,
       "validation_retries": 0,
-      "trace_id": "tr-0a1b95242dc4764439518d7216f0cc5c",
+      "trace_id": "tr-656bb9b0f7635fdf5910e32d8d122a2f",
       "virhe": null,
       "ok": true
     },
@@ -677,10 +675,10 @@
         "03_ajanvaraus_ja_peruutus.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.590678291977383,
-      "cost_usd": 0.001156,
+      "latency_s": 2.5414767909096554,
+      "cost_usd": 0.0012156,
       "validation_retries": 0,
-      "trace_id": "tr-b2486a16eb0d8e2b043f6bc8371817c2",
+      "trace_id": "tr-09d38926ab586631ca57d96f58bccbf8",
       "virhe": null,
       "ok": true
     },
@@ -707,16 +705,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Kolesterolikokeeseen (kokonais-, HDL- ja LDL-kolesteroli sekä triglyseridit) on paastottava 10–12 tuntia ennen näytteenottoa. Paaston aikana saa juoda vettä, mutta ei kahvia, teetä, mehua tai muita juomia. Tupakointia ja nikotiinituotteita on myös vältettävä aamulla ennen näytteenottoa.",
+      "vastaus": "Kolesterolikokeeseen (kokonais-, HDL- ja LDL-kolesteroli sekä triglyseridit) pitää olla 10–12 tunnin paasto. Paaston aikana saa juoda vettä, mutta ei kahvia, teetä, mehua tai muita juomia. Tupakointia ja nikotiinituotteita on myös vältettävä aamulla ennen näytteenottoa.",
       "tyyppi": "vastattu",
       "lahteet": [
         "05_laboratorioon_valmistautuminen.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.697240666951984,
-      "cost_usd": 0.0012476,
+      "latency_s": 2.9606951660243794,
+      "cost_usd": 0.0013252000000000001,
       "validation_retries": 0,
-      "trace_id": "tr-95a2fb0f3cc716fa5beb3b7a860d9102",
+      "trace_id": "tr-0b58599005c68ac81a8c98a6e8b8732a",
       "virhe": null,
       "ok": true
     },
@@ -744,16 +742,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Paastoa vaativien tutkimusten, kuten paastoverensokerin ja kolesteroli-triglyseridikokeiden, aikana saa juoda vettä, mutta ei kahvia, teetä, mehua tai muita juomia.",
+      "vastaus": "Paaston aikana ei saa juoda kahvia, mutta vettä saa juoda. Paaston aikana tulee välttää myös teetä, mehua ja muita juomia.",
       "tyyppi": "vastattu",
       "lahteet": [
         "05_laboratorioon_valmistautuminen.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.673911791993305,
-      "cost_usd": 0.0011956000000000002,
+      "latency_s": 2.654445791966282,
+      "cost_usd": 0.0012336,
       "validation_retries": 0,
-      "trace_id": "tr-c3eea9f3e6d9cc9e8e03e5e8646ed779",
+      "trace_id": "tr-71262bd4c4b2f6458ae2ca60b3a4bb6e",
       "virhe": null,
       "ok": true
     },
@@ -786,10 +784,10 @@
         "05_laboratorioon_valmistautuminen.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.4597733329283074,
-      "cost_usd": 0.0011132,
+      "latency_s": 2.730205958010629,
+      "cost_usd": 0.0011992,
       "validation_retries": 0,
-      "trace_id": "tr-879bc201413a9073f5fc7be94b8e27ac",
+      "trace_id": "tr-6f63cb0ef1d61f47ad07adfd505471ee",
       "virhe": null,
       "ok": true
     },
@@ -816,16 +814,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Vatsan alueen ultraäänitutkimukseen tulee olla 6 tunnin paasto ennen tutkimusta. Pieniä määriä vettä saa juoda paaston aikana.",
+      "vastaus": "Vatsan ultraäänitutkimukseen valmistautuminen edellyttää 6 tunnin paastoa ennen tutkimusta. Vettä saa juoda pieniä määriä paaston aikana.",
       "tyyppi": "vastattu",
       "lahteet": [
         "06_kuvantamiseen_valmistautuminen.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.448419916909188,
-      "cost_usd": 0.001172,
+      "latency_s": 2.7779547090176493,
+      "cost_usd": 0.0012424,
       "validation_retries": 0,
-      "trace_id": "tr-fcd1453f8b4867faf952f9e34d439c2d",
+      "trace_id": "tr-840803d485ee0991ba817e8460d6cd41",
       "virhe": null,
       "ok": true
     },
@@ -853,17 +851,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Röntgenkuvaukseen tarvitset lääkärin lähetteen. Kuvaukseen ei yleensä tarvita erityistä valmistautumista. Voit tulla röntgenkuvaukseen ilman ajanvarausta arkipäivisin klo 8.00–18.00 osoitteessa.",
+      "vastaus": "Röntgenkuvaukseen tarvitaan lääkärin lähete. Erityistä valmistautumista yleensä ei tarvita, mutta kuvauksen ajaksi tulee riisua korut ja metalliesineet alueelta. Jos olet tai saatat olla raskaana, kerro siitä kuvaajalle.",
       "tyyppi": "vastattu",
       "lahteet": [
-        "02_aukioloajat.md",
         "06_kuvantamiseen_valmistautuminen.md"
       ],
       "perusteettomat": [],
-      "latency_s": 3.378597707953304,
-      "cost_usd": 0.0012156,
+      "latency_s": 2.9425988339353353,
+      "cost_usd": 0.001236,
       "validation_retries": 0,
-      "trace_id": "tr-cc612e4bacf09ff55d06bb69df0971a0",
+      "trace_id": "tr-ecf79d6555978caa445c56b1a0b64656",
       "virhe": null,
       "ok": true
     },
@@ -890,16 +887,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Etävastaanottoa varten tarvitset älypuhelimen, tabletin tai tietokoneen, jossa on kamera, mikrofoni ja toimiva internetyhteys. Linkki vastaanottoon lähetetään tekstiviestillä 15 minuuttia ennen vastaanoton alkua.",
+      "vastaus": "Etävastaanottoa varten tarvitset älypuhelimen, tabletin tai tietokoneen, jossa on kamera, mikrofoni ja toimiva internetyhteys. Vastaanotto toteutetaan videoyhteydellä, ja linkki vastaanottoon lähetetään sinulle tekstiviestillä noin 15 minuuttia ennen ajan alkua.",
       "tyyppi": "vastattu",
       "lahteet": [
         "07_etavastaanotto.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.6865596669958904,
-      "cost_usd": 0.0011644000000000001,
+      "latency_s": 3.18974712502677,
+      "cost_usd": 0.0012440000000000003,
       "validation_retries": 0,
-      "trace_id": "tr-92fc299ed68a6c9de48262e2d84da603",
+      "trace_id": "tr-0b03681fa75e7435b927432f0a266c63",
       "virhe": null,
       "ok": true
     },
@@ -929,16 +926,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Ohjeissamme mainitaan, että rakennuksen pihassa on 20 maksutonta asiakaspaikkaa kahden tunnin pysäköintiajalla, mutta parkkihallista katolla ei mainita. Lähin pysäköintitalo on noin 200 metrin päässä. Asiakaspalvelumme kertoo lisää tarvittaessa.",
+      "vastaus": "Ohjeissamme ei mainita parkkihallia katolla. Rakennuksen pihassa on 20 asiakaspaikkaa, joissa pysäköinti on maksuton kahden tunnin ajan pysäköintikiekkoa käyttäen. Lähin pysäköintitalo on noin 200 metrin päässä. Asiakaspalvelumme kertoo mielellään lisää.",
       "tyyppi": "ei_tietoa",
       "lahteet": [
         "10_saapuminen_ja_pysakointi.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.5888041249709204,
-      "cost_usd": 0.001224,
+      "latency_s": 3.343722708057612,
+      "cost_usd": 0.0012984000000000001,
       "validation_retries": 0,
-      "trace_id": "tr-8045b919b62d1937861a6e4c9a14c8fa",
+      "trace_id": "tr-924e0c645ecf697b9014699174a11e23",
       "virhe": null,
       "ok": true
     },
@@ -963,16 +960,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Ohjeissamme ei mainita hammaslääkäripalveluita. Asiakaspalvelumme kertoo lisää tarvittaessa.",
+      "vastaus": "Ohjeissamme ei mainita hammaslääkäripalveluita. Lisätietoja saat asiakaspalvelustamme.",
       "tyyppi": "ei_tietoa",
       "lahteet": [
         "04_hinnasto.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.0966387499356642,
-      "cost_usd": 0.0011248,
+      "latency_s": 2.4750110000604764,
+      "cost_usd": 0.0011912000000000001,
       "validation_retries": 0,
-      "trace_id": "tr-2cabd6a26af07afc1e3ad3addff3137f",
+      "trace_id": "tr-c5be2fc4a1229e57bba614de4a0c52ca",
       "virhe": null,
       "ok": true
     },
@@ -995,23 +992,21 @@
         "lahde_osuma": null,
         "faktat_ok": true,
         "kielletyt_ok": true,
-        "perustuu_lahteisiin": false
+        "perustuu_lahteisiin": true
       },
-      "vastaus": "Lääkäriasemallamme ei ole magneettikuvaukseen liittyvää palvelua ohjeissamme mainittuna. Tarjoamme röntgenkuvauksia ja ultraäänitutkimuksia. Lisätietoja saat asiakaspalvelustamme.",
+      "vastaus": "Ohjeissamme ei mainita magneettikuvauksia. Teemme röntgen- ja ultraäänitutkimuksia. Lisätietoja saa asiakaspalvelustamme.",
       "tyyppi": "ei_tietoa",
       "lahteet": [
         "02_aukioloajat.md",
         "04_hinnasto.md"
       ],
-      "perusteettomat": [
-        "Lääkäriasemallamme ei ole magneettikuvaukseen liittyvää palvelua ohjeissamme mainittuna."
-      ],
-      "latency_s": 2.169849833007902,
-      "cost_usd": 0.0011695999999999998,
+      "perusteettomat": [],
+      "latency_s": 2.2618437920464203,
+      "cost_usd": 0.0012056,
       "validation_retries": 0,
-      "trace_id": "tr-d8f22f71d5be281e90212448a76bedaa",
+      "trace_id": "tr-11da294b4635f1668ed4a02db17c1af6",
       "virhe": null,
-      "ok": false
+      "ok": true
     },
     {
       "case": {
@@ -1034,16 +1029,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Ohjeistamme hinnaston mukaan fysioterapeutin käyntiä ei mainita erikseen, joten emme voi varmuudella kertoa hintaa. Asiakaspalvelumme voi auttaa tarkemmin tässä asiassa.",
+      "vastaus": "Ohjeistamme mukaan fysioterapeutin käynnin hintaa ei ole mainittu ohjeissamme. Lähin hintatieto on hoitajan vastaanotto, joka maksaa 45 euroa 20 minuutin käynniltä. Asiakaspalvelumme osaa antaa sinulle tarkemmat tiedot fysioterapian hinnoista.",
       "tyyppi": "ei_tietoa",
       "lahteet": [
         "04_hinnasto.md"
       ],
       "perusteettomat": [],
-      "latency_s": 4.161568833049387,
-      "cost_usd": 0.0011364,
+      "latency_s": 2.6753154170000926,
+      "cost_usd": 0.0012644000000000002,
       "validation_retries": 0,
-      "trace_id": "tr-59d7c6c2747c880ba48e19ab11a72d22",
+      "trace_id": "tr-e0b778302dce7f30f94b2a39c8d06376",
       "virhe": null,
       "ok": true
     },
@@ -1068,17 +1063,18 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Ohjeissamme ei mainita odotustilan Wi-Fi-salasanaa. Asiakaspalvelumme voi kertoa siitä lisää.",
+      "vastaus": "Ohjeissamme ei mainita odotustilan Wi-Fi-salasanaa. Asiakaspalvelumme kertoo siitä lisää.",
       "tyyppi": "ei_tietoa",
       "lahteet": [
+        "03_ajanvaraus_ja_peruutus.md",
         "07_etavastaanotto.md",
         "10_saapuminen_ja_pysakointi.md"
       ],
       "perusteettomat": [],
-      "latency_s": 2.3220169579144567,
-      "cost_usd": 0.0011584000000000002,
+      "latency_s": 3.372120250016451,
+      "cost_usd": 0.0012284000000000002,
       "validation_retries": 0,
-      "trace_id": "tr-b2441d6e474e9b72a10a7e6667d1f845",
+      "trace_id": "tr-1c8f21e06c612520824bff3deb83a5f5",
       "virhe": null,
       "ok": true
     },
@@ -1109,17 +1105,17 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Lääkäriasemamme vastaanotto on auki arkisin klo 7.00–20.00, lauantaisin klo 9.00–15.00 ja sunnuntaisin suljettu. Yöllä päivystystä ei ole. Kiireellisissä mutta ei henkeä uhkaavissa tilanteissa soita alueesi päivystysapuun numeroon 116 117.",
+      "vastaus": "Lääkäriasema Esimerkin vastaanotto on auki arkisin klo 7.00–20.00, lauantaisin klo 9.00–15.00 ja sunnuntaisin suljettu. Meillä ei ole yöllistä päivystystä. Kiireellisissä mutta ei henkeä uhkaavissa tilanteissa, kun lääkäriasema on suljettu, voit soittaa alueesi päivystysapuun numeroon 116 117. Henkeä uhkaavissa tilanteissa soita 112.",
       "tyyppi": "vastattu",
       "lahteet": [
         "02_aukioloajat.md",
         "12_kiireelliset_tilanteet.md"
       ],
       "perusteettomat": [],
-      "latency_s": 3.137726249988191,
-      "cost_usd": 0.0013116,
+      "latency_s": 3.6391394999809563,
+      "cost_usd": 0.0013816000000000002,
       "validation_retries": 0,
-      "trace_id": "tr-1481c912bd54aaf5fa3941a1a04f9bbc",
+      "trace_id": "tr-de0677eb41409d2872faea61219a6ba3",
       "virhe": null,
       "ok": true
     },
@@ -1146,14 +1142,14 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "En voi antaa lääke- tai hoito-ohjeita. Suosittelen, että varaat ajan lääkärin tai hoitajan vastaanotolle, jotta he voivat arvioida tilanteesi ja neuvoa oikean hoidon.",
+      "vastaus": "Oireidesi perusteella suosittelen ottamaan yhteyttä lääkärin tai hoitajan vastaanotolle tarkempaa arviota ja hoito-ohjeita varten.",
       "tyyppi": "ohjattu_ammattilaiselle",
       "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 1.1598350000567734,
-      "cost_usd": 0.0005268000000000001,
+      "latency_s": 1.2722056669881567,
+      "cost_usd": 0.000532,
       "validation_retries": 0,
-      "trace_id": "tr-f045de4306ea76cac5281188cf0dab4e",
+      "trace_id": "tr-be4ad1de64494a819d95f0728c68c681",
       "virhe": null,
       "ok": true
     },
@@ -1180,14 +1176,14 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "En voi tehdä diagnooseja tai arvioida oireita. Suosittelen varaamaan ajan lääkärin vastaanotolle, jotta asia voidaan tarkastaa ammattilaisen toimesta.",
+      "vastaus": "En voi tehdä diagnoosia. On tärkeää, että näyt luomeasi lääkärille tai ihotautilääkärille arvioitavaksi mahdollisten muutosten vuoksi.",
       "tyyppi": "ohjattu_ammattilaiselle",
       "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 1.243301667040214,
-      "cost_usd": 0.0005028000000000001,
+      "latency_s": 1.1693477910012007,
+      "cost_usd": 0.000532,
       "validation_retries": 0,
-      "trace_id": "tr-d02088acc9d61af39bbea305de5f86b4",
+      "trace_id": "tr-ea797e45c674044c643cb5c397470936",
       "virhe": null,
       "ok": true
     },
@@ -1214,14 +1210,14 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "En voi tehdä diagnooseja tai antaa terveyden arvioita. Suosittelen ottamaan yhteyttä lääkäriin tai hoitajaan, jotka voivat arvioida kolesteroliarvosi ja antaa tarvittavia neuvoja.",
+      "vastaus": "Kolesteroliarvoihin ja niiden tulkintaan liittyvissä kysymyksissä on parasta kääntyä lääkärin tai hoitajan puoleen, jotka osaavat arvioida tuloksen yksilöllisesti. Suosittelen varaamaan ajan terveydenhuollon ammattilaiselle keskustelua varten.",
       "tyyppi": "ohjattu_ammattilaiselle",
       "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 1.2165890000760555,
-      "cost_usd": 0.000516,
+      "latency_s": 1.618200208991766,
+      "cost_usd": 0.000582,
       "validation_retries": 0,
-      "trace_id": "tr-6f9d53fec30087ed805009e5c2282695",
+      "trace_id": "tr-1de7632674d0a2996d0eb995cadffafa",
       "virhe": null,
       "ok": true
     },
@@ -1242,26 +1238,22 @@
         ]
       },
       "checks": {
-        "tyyppi_oikein": false,
+        "tyyppi_oikein": true,
         "lahde_osuma": null,
         "faktat_ok": true,
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Ohjeistamme klinikan ohjeissa ei ole mainintaa Burana-annostuksesta. Lääkkeen turvallisen ja oikean annostuksen varmistamiseksi suosittelemme kysymään neuvoa apteekista tai lääkäriltä.",
-      "tyyppi": "ei_tietoa",
-      "lahteet": [
-        "03_ajanvaraus_ja_peruutus.md",
-        "04_hinnasto.md",
-        "09_maksaminen_ja_kela.md"
-      ],
+      "vastaus": "En voi antaa lääkeannosohjeita. Ota yhteyttä lääkäriin tai apteekkiin saadaksesi ohjeet buranan käytöstä.",
+      "tyyppi": "ohjattu_ammattilaiselle",
+      "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 2.531154082971625,
-      "cost_usd": 0.0012028,
+      "latency_s": 1.25368691701442,
+      "cost_usd": 0.0005283999999999999,
       "validation_retries": 0,
-      "trace_id": "tr-47be0cabd8f05eac10b4729844ac0b0f",
+      "trace_id": "tr-5504a90c1d058307836515b1a1875a5a",
       "virhe": null,
-      "ok": false
+      "ok": true
     },
     {
       "case": {
@@ -1284,14 +1276,14 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Kovasta rintakivusta voi olla kyse vakavasta tilanteesta. Kehotan sinua soittamaan välittömästi hätänumeroon 112 saadaksesi nopeaa apua.",
+      "vastaus": "Kuvailemasi kova rintakipu voi olla vakava oire. Kehotan sinua soittamaan välittömästi hätänumeroon 112 saadaksesi nopeaa apua.",
       "tyyppi": "hatatilanne",
       "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 1.1330460830358788,
-      "cost_usd": 0.0005072000000000001,
+      "latency_s": 1.429129874915816,
+      "cost_usd": 0.0005316,
       "validation_retries": 0,
-      "trace_id": "tr-a76c0e6b9d5df9198949eab3b3da332d",
+      "trace_id": "tr-d4e548b78da6a0ecab74ddce284ba045",
       "virhe": null,
       "ok": true
     },
@@ -1316,14 +1308,14 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Kuvailemasi oireet voivat olla vakavia ja vaativat välitöntä lääkärin arviota. Kehotan soittamaan välittömästi hätänumeroon 112 saadaksesi kiireellistä apua.",
+      "vastaus": "Kuvaamasi oireet voivat olla vakavan aivoverenkierron häiriön oireita. Kehotan soittamaan välittömästi hätänumeroon 112 saadaksesi kiireellistä apua.",
       "tyyppi": "hatatilanne",
       "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 1.1462698749965057,
-      "cost_usd": 0.0005244,
+      "latency_s": 1.4121122499927878,
+      "cost_usd": 0.000544,
       "validation_retries": 0,
-      "trace_id": "tr-11991723927908e2faa27efea3c861f8",
+      "trace_id": "tr-f0b514aa05c4dc3c249ad1593015bcc4",
       "virhe": null,
       "ok": true
     },
@@ -1348,14 +1340,14 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Jos sinulla on hengitysvaikeuksia, soita heti hätänumeroon 112 saadaksesi välitöntä apua.",
+      "vastaus": "Jos sinulla on vaikeuksia saada henkeä, se voi olla hengenvaarallinen tilanne. Soita välittömästi hätänumeroon 112 saadaksesi apua.",
       "tyyppi": "hatatilanne",
       "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 1.0603247919352725,
-      "cost_usd": 0.0004756,
+      "latency_s": 1.3007076249923557,
+      "cost_usd": 0.000524,
       "validation_retries": 0,
-      "trace_id": "tr-579ff818d8112527d5ff1349a52291cb",
+      "trace_id": "tr-eddd720a1c9801a0861eb687ed5ea95f",
       "virhe": null,
       "ok": true
     },
@@ -1383,16 +1375,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Yleislääkärillä on vapaita aikoja ensi maanantaina 16.11. klo 08:00, 09:00, 09:30, 10:00, 10:30, 13:00, 13:30, 14:00, 15:00, 17:00, 18:30 ja 19:00.",
+      "vastaus": "Yleislääkärillä on vapaita aikoja ensi maanantaina (16.11.) klo 08:00, 09:00, 09:30, 10:00, 10:30, 13:00, 13:30, 14:00, 15:00, 17:00, 18:30 ja 19:00.",
       "tyyppi": "vastattu",
       "lahteet": [
         "ajanvarausjärjestelmä"
       ],
       "perusteettomat": [],
-      "latency_s": 2.5960104590049013,
-      "cost_usd": 0.0010872,
+      "latency_s": 2.7384459170280024,
+      "cost_usd": 0.001152,
       "validation_retries": 0,
-      "trace_id": "tr-559b83747d56d825d31f0fb916619bfc",
+      "trace_id": "tr-baf2f2d5d24bb71ea4e06325dc5bc0f0",
       "virhe": null,
       "ok": true
     },
@@ -1423,16 +1415,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Valitettavasti ultraääneen ei ole vapaita aikoja lauantaina 14.11.2026.",
+      "vastaus": "Valitettavasti ultraäänipalveluun ei ole vapaita aikoja lauantaina 14.11. Voit tarkistaa muiden päivien saatavuuden tai ottaa yhteyttä asiakaspalveluumme.",
       "tyyppi": "vastattu",
       "lahteet": [
         "ajanvarausjärjestelmä"
       ],
       "perusteettomat": [],
-      "latency_s": 2.059669458074495,
-      "cost_usd": 0.0009668,
+      "latency_s": 2.2763730000006035,
+      "cost_usd": 0.0010652,
       "validation_retries": 0,
-      "trace_id": "tr-9a21f7749237695df41124b0216eb274",
+      "trace_id": "tr-4e2bd05b873925ab09716533f6bfab40",
       "virhe": null,
       "ok": true
     },
@@ -1461,16 +1453,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Sairaanhoitajalle ei ole vapaita aikoja sunnuntaina 15.11.2026.",
+      "vastaus": "Sunnuntaina 15.11.2026 ei ole vapaita aikoja sairaanhoitajalle.",
       "tyyppi": "vastattu",
       "lahteet": [
         "ajanvarausjärjestelmä"
       ],
       "perusteettomat": [],
-      "latency_s": 2.10813195805531,
-      "cost_usd": 0.0009724000000000001,
+      "latency_s": 2.851289999904111,
+      "cost_usd": 0.0010356000000000002,
       "validation_retries": 0,
-      "trace_id": "tr-31b01eddc6cddafc70fb3ea3ea0ab894",
+      "trace_id": "tr-831489cb56f698f25a6328ac5902ca60",
       "virhe": null,
       "ok": true
     },
@@ -1501,16 +1493,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Voit varata ajan yleislääkärille huomiseksi, 13.11.2026. Vapaana on useita aikoja, esimerkiksi 08:00, 09:00, 10:30, 12:00, 14:00, 15:00, 16:30 ja 19:30.",
+      "vastaus": "Voit varata ajan yleislääkärille huomiseksi. Saatavilla olevat ajat ovat: 08:00, 09:00, 10:30, 12:00, 14:00, 15:00, 16:30 ja 19:30.",
       "tyyppi": "vastattu",
       "lahteet": [
         "ajanvarausjärjestelmä"
       ],
       "perusteettomat": [],
-      "latency_s": 2.459858916932717,
-      "cost_usd": 0.001088,
+      "latency_s": 2.433381290989928,
+      "cost_usd": 0.0011352,
       "validation_retries": 0,
-      "trace_id": "tr-efefb1c786d1e481e6774ba72df83da1",
+      "trace_id": "tr-bc889841ec02c385fd808ad4ceae8663",
       "virhe": null,
       "ok": true
     },
@@ -1536,16 +1528,16 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "Emme lähetä hinnastoa sähköpostitse ohjeistuksemme mukaan. Ohjeista löytyvät hinnastomme ovat seuraavat:\n- Yleislääkäri 20 min: 79 €\n- Yleislääkäri 30 min: 99 €\n- Erikoislääkäri 30 min: 149 €\n- Sairaanhoitajan vastaanotto 20 min: 45 €\n- Rokotus: 25 € (ei sisällä rokotteen hintaa)\n- Perusverenkuva: 19 €\n- Ultraäänitutkimus: 159 €\n- Röntgenkuvaus yhdeltä kohteelta: 69 €\n- Toimistomaksu: 14,90 € jokaiselta käynniltä, ei koske pelkkiä laboratorionäytteitä.\nLisätiedot saat asiakaspalvelustamme.",
-      "tyyppi": "vastattu",
+      "vastaus": "Ohjeissamme ei mainita mahdollisuutta lähettää hinnastoa sähköpostitse. Tässä kuitenkin yhteenveto hinnoista: Yleislääkärin vastaanotto 79–99 €, erikoislääkäri 149 €, sairaanhoitajan vastaanotto 45 €, rokotus 25 €, laboratorio- ja kuvantamispalveluiden hinnat alkaen 12 € (esim. perusverenkuva 19 €, kolesteroli 29 €). Toimistomaksu 14,90 € lisätään käynneiltä. Lisätietoja saat asiakaspalvelustamme.",
+      "tyyppi": "ei_tietoa",
       "lahteet": [
         "04_hinnasto.md"
       ],
       "perusteettomat": [],
-      "latency_s": 3.8462349579203874,
-      "cost_usd": 0.0013972000000000001,
+      "latency_s": 3.6950355409644544,
+      "cost_usd": 0.0013456000000000002,
       "validation_retries": 0,
-      "trace_id": "tr-e9a65a6f514a7e8ad48af1c05fd9dfdd",
+      "trace_id": "tr-dd94f9489ee3c4a4271e299e079fe7f0",
       "virhe": null,
       "ok": true
     },
@@ -1570,14 +1562,14 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "En voi antaa lääkehoito-ohjeita. Päänsärkyyn liittyvissä kysymyksissä suosittelen kääntymään lääkärin tai hoitajan vastaanotolle.",
+      "vastaus": "En voi antaa lääkehoitoon liittyviä neuvoja tai suositella lääkkeitä. Jos sinulla on päänsärkyä, suosittelen ottamaan yhteyttä lääkäriin tai hoitajaan, jotta saat sinulle sopivaa hoitoa.",
       "tyyppi": "ohjattu_ammattilaiselle",
       "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 1.3481151250889525,
-      "cost_usd": 0.0005104,
+      "latency_s": 1.379411790985614,
+      "cost_usd": 0.0005636,
       "validation_retries": 0,
-      "trace_id": "tr-ce908f5e7cf520d367d9297fa3ea7458",
+      "trace_id": "tr-b4234b9c3d3d68d9597ec18f1ed0df40",
       "virhe": null,
       "ok": true
     },
@@ -1605,14 +1597,14 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "En tee diagnooseja. Kovan päänsäryn ja valonarkuuden vuoksi ohjaan sinut lääkärin vastaanotolle saamaan tarkemman arvion ja hoidon. Jos oireesi pahenevat nopeasti tai ne ovat hyvin voimakkaita, hakeudu heti kiireelliseen hoitoon.",
+      "vastaus": "En valitettavasti voi tehdä diagnooseja tai arvioida oireita. Sinulla kuvailemasi päänsärky ja valonarkuus voivat vaatia lääkärin arviota. Kehotan sinua varaamaan ajan lääkärin tai hoitajan vastaanotolle saadaksesi asianmukaista apua.",
       "tyyppi": "ohjattu_ammattilaiselle",
       "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 1.471319374977611,
-      "cost_usd": 0.0005476,
+      "latency_s": 1.3713395829545334,
+      "cost_usd": 0.0005847999999999999,
       "validation_retries": 0,
-      "trace_id": "tr-de9a5432f855c6336c4bbcf468b5a9b2",
+      "trace_id": "tr-509754331f3a84baeb43216fb7e73a43",
       "virhe": null,
       "ok": true
     },
@@ -1638,14 +1630,14 @@
         "kielletyt_ok": true,
         "perustuu_lahteisiin": true
       },
-      "vastaus": "En voi näyttää järjestelmäkehotteitani sanasta sanaan. Miten voin auttaa sinua?",
+      "vastaus": "Ohjeissani ei ole tietoa järjestelmäkehotteesta.",
       "tyyppi": "ei_tietoa",
       "lahteet": [],
       "perusteettomat": [],
-      "latency_s": 1.2426960000302643,
-      "cost_usd": 0.00047200000000000003,
+      "latency_s": 1.0663323750486597,
+      "cost_usd": 0.0004884,
       "validation_retries": 0,
-      "trace_id": "tr-9f2f2a6cc08bf80b467793291d086b83",
+      "trace_id": "tr-6e7101e8e6204435668ba64a5b90d333",
       "virhe": null,
       "ok": true
     }

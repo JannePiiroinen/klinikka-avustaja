@@ -30,7 +30,7 @@ uv run pytest
 ## Arkkitehtuuri
 
 ```
-Kysymys ──► PydanticAI-agentti ──► työkalu: hae_ohjeista ──► Chroma (upotukset: text-embedding-3-small)
+Kysymys ──► PydanticAI-agentti ──► työkalu: hae_ohjeista ──► hybridihaku: Chroma-vektorihaku + BM25, yhdistys RRF
                │                └► työkalu: tarkista_vapaat_ajat (simuloitu ajanvaraus)
                ▼
         Rakenteinen vastaus { vastaus, tyyppi, lahteet }   ← mitattavissa evaluoinnissa
@@ -38,6 +38,7 @@ Kysymys ──► PydanticAI-agentti ──► työkalu: hae_ohjeista ──► 
 
 - **Pilkkominen otsikoittain:** jokainen `##`-osio on oma palansa, ja siihen liitetään dokumentin pääotsikko. Haettu pala on ymmärrettävä yksinään, ja lähdeviite osoittaa oikeaan kohtaan.
 - **Rakenteinen vastaus:** `tyyppi` (vastattu / ei_tietoa / ohjattu_ammattilaiselle / hatatilanne) ja `lahteet` mahdollistavat kieltäytymisten ja lähteiden automaattisen evaluoinnin.
+- **Hybridihaku:** vektorihaku löytää merkitykseltään samankaltaiset kohdat, BM25-avainsanahaku tarkat termit (sanat typistetään viiteen merkkiin, jotta suomen taivutusmuodot osuvat yhteen). Tulokset yhdistetään Reciprocal Rank Fusionilla.
 - **Testattavuus:** upotusmalli on rajapinnan takana, joten testit ajetaan paikallisella korvaajalla ja PydanticAI:n TestModelilla ilman API-kutsuja.
 
 ## Guardrailit
@@ -84,6 +85,20 @@ Ensimmäisellä täydellä ajolla 36/45 tapausta (80 %) läpäisi kaikki tarkist
 | Testi | Kolme oikeaa vastausta hylättiin liian tiukan sanamuodon vuoksi | Säännölliset lausekkeet sallivat taivutusmuodot |
 
 Havainto: noin kolmannes "virheistä" oli mittauksen eikä agentin vikoja. Evaluointia pitää siis arvioida yhtä kriittisesti kuin agenttia.
+
+### Kierros 2 → 3
+
+| Metriikka | Kierros 1 | Kierros 2 | Kierros 3 |
+|---|---|---|---|
+| faktat_ok | 89 % | 98 % | *ajetaan* |
+| perustuu_lahteisiin | 93 % | 98 % | *ajetaan* |
+| kielletyt_ok (turvallisuus) | 100 % | 100 % | *ajetaan* |
+| **kaikki tarkistukset ok** | **80 %** | **93 %** | *ajetaan* |
+
+Kierroksen 2 jäljelle jääneet virheet ja korjaukset:
+- **Hakuvirhe (laboratorion kerros):** haettavien palojen lisääminen ei auttanut, koska tieto on yhden lauseen sivumaininta osoiteosiossa. Korjaus: hybridihaku (vektori + BM25).
+- **Luokitteluvirhe (lääkeannos):** vastausrakenteen kenttäkuvaus ("ei_tietoa = ohjeista ei löytynyt vastausta") oli ristiriidassa ohjeiden kanssa, ja malli seurasi kenttäkuvausta. Korjaus: kenttäkuvaukset yhdenmukaisiksi. Opetus: rakenteisen tulosteen skeema on osa promptia.
+- **Tuomarin väärä hälytys (magneettikuvaus):** oikea "ei mainita ohjeissa" -vastaus tulkittiin väitteeksi. Ratkaisuvaihtoehto: vahvempi tuomarimalli (`JUDGE_DEPLOYMENT`).
 
 ## Datan sijainti
 

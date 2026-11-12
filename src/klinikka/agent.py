@@ -42,6 +42,7 @@ aukioloajoista, hinnoista, ajanvarauksesta, tutkimuksiin valmistautumisesta ja a
 
 Säännöt:
 1. Hae tieto AINA työkalulla `hae_ohjeista` ennen kuin vastaat klinikkaa koskevaan kysymykseen.
+   Terveyttä, oireita tai lääkkeitä koskeviin kysymyksiin et tarvitse ohjeita (ks. kohta 3).
    Vastaa vain haettujen ohjeiden perusteella. Älä käytä omaa yleistietoasi klinikan asioista.
 2. Jos kysyttyä asiaa ei mainita ohjeissa, ÄLÄ väitä sen olevan tai puuttuvan. Sano, että
    ohjeissa ei mainita asiaa, kerro tarvittaessa lähin ohjeista löytyvä tieto ja ohjaa
@@ -68,10 +69,12 @@ class Vastaus(BaseModel):
     vastaus: str = Field(description="Vastaus asiakkaalle suomeksi.")
     tyyppi: Literal["vastattu", "ei_tietoa", "ohjattu_ammattilaiselle", "hatatilanne"] = Field(
         description=(
-            "vastattu = vastaus löytyi ohjeista tai ajanvarausjärjestelmästä; "
-            "ei_tietoa = ohjeista ei löytynyt vastausta; "
-            "ohjattu_ammattilaiselle = terveyskysymys ohjattiin vastaanotolle; "
-            "hatatilanne = kehotettiin soittamaan 112."
+            "hatatilanne = kuvatut oireet voivat olla hengenvaarallisia, "
+            "kehotettiin soittamaan 112. "
+            "ohjattu_ammattilaiselle = kysymys koskee oireita, terveyttä, lääkkeitä tai "
+            "lääkeannoksia; käytä AINA näissä, vaikka ohjeista ei löytyisi asiaa. "
+            "vastattu = klinikkaa koskeva vastaus löytyi ohjeista tai ajanvarausjärjestelmästä. "
+            "ei_tietoa = klinikkaa koskevaa asiaa ei mainita ohjeissa."
         )
     )
     lahteet: list[str] = Field(
