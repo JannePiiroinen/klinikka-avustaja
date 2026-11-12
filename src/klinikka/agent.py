@@ -26,7 +26,8 @@ from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models import Model
 
-from klinikka.config import KNOWLEDGE_BASE_DIR
+from klinikka import tracing
+from klinikka.config import KNOWLEDGE_BASE_DIR, Settings
 from klinikka.guardrails import check_input, public_contacts, redact_pii
 from klinikka.retrieval import Retriever, SearchHit
 from klinikka.slots import Palvelu, free_slots
@@ -45,16 +46,21 @@ Säännöt:
 2. Jos kysyttyä asiaa ei mainita ohjeissa, ÄLÄ väitä sen olevan tai puuttuvan. Sano, että
    ohjeissa ei mainita asiaa, kerro tarvittaessa lähin ohjeista löytyvä tieto ja ohjaa
    asiakaspalveluun. Merkitse tällöin tyypiksi `ei_tietoa`.
+   Esimerkki: "Onko teillä sauna?" -> "Ohjeissamme ei mainita saunaa. Asiakaspalvelumme
+   kertoo lisää." EI: "Meillä ei ole saunaa."
 3. Et tee diagnooseja, et arvioi oireita etkä anna hoito- tai lääkitysohjeita. Jos kysymys koskee
-   omia oireita tai terveyttä, ohjaa lääkärin tai hoitajan vastaanotolle. Jos kuvatut oireet voivat
-   olla hengenvaarallisia (esim. rintakipu, hengenahdistus, halvausoireet), kehota soittamaan 112.
+   omia oireita, terveyttä, lääkkeitä tai lääkeannoksia, ohjaa lääkärin tai hoitajan vastaanotolle
+   ja merkitse tyypiksi `ohjattu_ammattilaiselle`, vaikka ohjeista ei löytyisi asiaa. Jos kuvatut
+   oireet voivat olla hengenvaarallisia (esim. rintakipu, hengenahdistus, halvausoireet), kehota
+   soittamaan 112.
 4. Merkitse `lahteet`-kenttään vain niiden ohjetiedostojen nimet, jotka `hae_ohjeista` palautti
    ja joihin vastaus perustuu. Jos käytit työkalua `tarkista_vapaat_ajat`, merkitse lähteeksi
    "{BOOKING_SOURCE}".
 5. Viestissä voi olla merkintöjä kuten [HENKILÖTUNNUS POISTETTU]. Ne ovat tietosuojasyistä
    poistettuja tietoja. Älä pyydä asiakasta kertomaan niitä uudelleen.
-6. Vastaa suomeksi, ystävällisesti ja tiiviisti. Kerro hinnat ja kellonajat täsmälleen ohjeiden
-   mukaisina.
+6. Vastaa suomeksi, ystävällisesti ja tiiviisti. Vastaa vain siihen, mitä kysyttiin: älä
+   luettele epäolennaisia hintoja tai palveluita. Älä aloita vastausta väitteellä, jota
+   seuraavat lauseet kumoavat. Kerro hinnat ja kellonajat täsmälleen ohjeiden mukaisina.
 """
 
 
@@ -79,6 +85,7 @@ class Deps:
     today: date = field(default_factory=date.today)
     retrieved: list[SearchHit] = field(default_factory=list)
     used_booking: bool = False
+    booking_outputs: list[str] = field(default_factory=list)
 
     @property
     def allowed_sources(self) -> set[str]:
@@ -122,11 +129,13 @@ def build_agent(model: Model | str) -> Agent[Deps, Vastaus]:
         """
         ctx.deps.used_booking = True
         if paiva < ctx.deps.today:
-            return "Päivä on menneisyydessä."
-        slots = free_slots(palvelu, paiva)
-        if not slots:
-            return f"Ei vapaita aikoja palvelulle '{palvelu}' päivälle {paiva.isoformat()}."
-        return f"Vapaat ajat ({palvelu}, {paiva.isoformat()}): " + ", ".join(slots)
+            result = "Päivä on menneisyydessä."
+        elif slots := free_slots(palvelu, paiva):
+            result = f"Vapaat ajat ({palvelu}, {paiva.isoformat()}): " + ", ".join(slots)
+        else:
+            result = f"Ei vapaita aikoja palvelulle '{palvelu}' päivälle {paiva.isoformat()}."
+        ctx.deps.booking_outputs.append(result)
+        return result
 
     @agent.output_validator
     def tarkista_lahteet(ctx: RunContext[Deps], output: Vastaus) -> Vastaus:
@@ -149,15 +158,13 @@ def build_agent(model: Model | str) -> Agent[Deps, Vastaus]:
     return agent
 
 
-def build_azure_model() -> Model:
+def build_azure_model(deployment: str | None = None) -> Model:
     from pydantic_ai.models.openai import OpenAIChatModel
     from pydantic_ai.providers.azure import AzureProvider
 
-    from klinikka.config import Settings
-
     s = Settings.from_env()
     return OpenAIChatModel(
-        s.chat_deployment,
+        deployment or s.chat_deployment,
         provider=AzureProvider(
             azure_endpoint=s.azure_endpoint,
             api_version=s.azure_api_version,
@@ -174,15 +181,19 @@ def _kb_public_contacts() -> frozenset[str]:
 
 @dataclass(frozen=True)
 class AnswerResult:
+    question: str  # henkilötiedot poistettuna
     output: Vastaus
     input_tokens: int
     output_tokens: int
     requests: int
     latency_s: float
+    cost_usd: float | None
     retrieved_sources: list[str]
+    context: str  # agentin näkemä aineisto: haetut ohjeet ja ajanvarauksen vastaukset
     validation_retries: int
     pii_input: dict[str, int]
     pii_output: dict[str, int]
+    trace_id: str | None
 
 
 def answer(
@@ -190,33 +201,65 @@ def answer(
     retriever: Retriever,
     question: str,
     today: date | None = None,
+    settings: Settings | None = None,
 ) -> AnswerResult:
-    clean = redact_pii(check_input(question))
-    deps = Deps(retriever=retriever, today=today or date.today())
+    with tracing.span("klinikka-avustaja", "AGENT") as root:
+        with tracing.span("henkilotietojen_poisto", "GUARDRAIL") as guard:
+            clean = redact_pii(check_input(question))
+            guard.set_inputs({"merkkeja": len(question)})
+            guard.set_outputs({"loydokset": clean.findings})
+        root.set_inputs({"kysymys": clean.text})
 
-    start = time.perf_counter()
-    result = agent.run_sync(clean.text, deps=deps)
-    latency = time.perf_counter() - start
+        deps = Deps(retriever=retriever, today=today or date.today())
+        start = time.perf_counter()
+        result = agent.run_sync(clean.text, deps=deps)
+        latency = time.perf_counter() - start
 
-    output = result.output
-    out_clean = redact_pii(output.vastaus, allowed=_kb_public_contacts())
-    output.vastaus = out_clean.text
+        output = result.output
+        out_clean = redact_pii(output.vastaus, allowed=_kb_public_contacts())
+        output.vastaus = out_clean.text
 
-    retries = sum(
-        1
-        for msg in result.all_messages()
-        for part in getattr(msg, "parts", [])
-        if part.part_kind == "retry-prompt" or getattr(part, "outcome", None) == "retried"
-    )
-    usage = result.usage
+        retries = sum(
+            1
+            for msg in result.all_messages()
+            for part in getattr(msg, "parts", [])
+            if part.part_kind == "retry-prompt" or getattr(part, "outcome", None) == "retried"
+        )
+        usage = result.usage
+        cost = settings.cost_usd(usage.input_tokens, usage.output_tokens) if settings else None
+        unique_hits = {h.chunk_id: h for h in deps.retrieved}.values()
+        context = "\n\n---\n\n".join(
+            [f"[lähde: {h.source}]\n{h.text}" for h in unique_hits]
+            + [f"[lähde: {BOOKING_SOURCE}]\n{b}" for b in deps.booking_outputs]
+        )
+
+        root.set_outputs(output.model_dump())
+        root.set_attributes(
+            {
+                "tyyppi": output.tyyppi,
+                "latency_s": round(latency, 3),
+                "input_tokens": usage.input_tokens,
+                "output_tokens": usage.output_tokens,
+                "cost_usd": cost if cost is not None else -1.0,
+                "validation_retries": retries,
+                "retrieved_sources": ",".join(sorted({h.source for h in deps.retrieved})),
+                "pii_input_total": sum(clean.findings.values()),
+                "pii_output_total": sum(out_clean.findings.values()),
+            }
+        )
+
     return AnswerResult(
+        question=clean.text,
         output=output,
         input_tokens=usage.input_tokens,
         output_tokens=usage.output_tokens,
         requests=usage.requests,
         latency_s=latency,
+        cost_usd=cost,
         retrieved_sources=sorted({h.source for h in deps.retrieved}),
+        context=context,
         validation_retries=retries,
         pii_input=clean.findings,
         pii_output=out_clean.findings,
+        trace_id=tracing.last_trace_id(),
     )

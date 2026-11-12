@@ -75,7 +75,7 @@ class Retriever:
             metadatas=[{"source": c.source, "label": c.label} for c in chunks],
         )
 
-    def search(self, query: str, k: int = 4) -> list[SearchHit]:
+    def search(self, query: str, k: int = 6) -> list[SearchHit]:
         if self.count() == 0:
             raise RuntimeError("Hakuindeksi on tyhjä. Aja ensin: uv run python -m klinikka.ingest")
         res = self._collection.query(query_embeddings=self._embedder.embed([query]), n_results=k)

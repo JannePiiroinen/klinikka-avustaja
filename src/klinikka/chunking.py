@@ -56,7 +56,10 @@ def chunk_markdown(source: str, markdown: str) -> list[Chunk]:
 
 
 def load_chunks(directory: Path) -> list[Chunk]:
+    paths = sorted(directory.glob("*.md"))
+    if not paths:
+        raise FileNotFoundError(f"Tietopohjasta ei löytynyt yhtään .md-tiedostoa: {directory}")
     chunks: list[Chunk] = []
-    for path in sorted(directory.glob("*.md")):
+    for path in paths:
         chunks.extend(chunk_markdown(path.name, path.read_text(encoding="utf-8")))
     return chunks

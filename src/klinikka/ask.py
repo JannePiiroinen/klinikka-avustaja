@@ -11,10 +11,12 @@ import sys
 from klinikka.agent import answer, build_agent, build_azure_model
 from klinikka.config import Settings
 from klinikka.retrieval import AzureEmbedder, Retriever
+from klinikka.tracing import setup_tracing
 
 
 def main() -> None:
     settings = Settings.from_env()
+    setup_tracing()
     retriever = Retriever(AzureEmbedder(settings))
     agent = build_agent(build_azure_model())
 
@@ -23,8 +25,8 @@ def main() -> None:
         question = questions.pop() if questions else input("\nKysymys (tyhjä lopettaa): ").strip()
         if not question:
             break
-        r = answer(agent, retriever, question)
-        cost = settings.cost_usd(r.input_tokens, r.output_tokens)
+        r = answer(agent, retriever, question, settings=settings)
+        cost = r.cost_usd or 0.0
         print(f"\n{r.output.vastaus}")
         print(f"\n  tyyppi: {r.output.tyyppi}")
         print(f"  lähteet (malli): {', '.join(r.output.lahteet) or '-'}")
@@ -39,6 +41,7 @@ def main() -> None:
             f"  {r.latency_s:.2f} s | {r.requests} mallikutsua | "
             f"{r.input_tokens}+{r.output_tokens} tokenia | {cost * 100:.4f} senttiä"
         )
+        print(f"  trace: {r.trace_id}")
         if questions is not None:
             break
 
