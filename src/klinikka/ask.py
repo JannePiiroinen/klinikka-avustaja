@@ -29,6 +29,12 @@ def main() -> None:
         print(f"\n  tyyppi: {r.output.tyyppi}")
         print(f"  lähteet (malli): {', '.join(r.output.lahteet) or '-'}")
         print(f"  haetut dokumentit: {', '.join(r.retrieved_sources) or '-'}")
+        if r.pii_input:
+            print(f"  poistetut henkilötiedot (syöte): {r.pii_input}")
+        if r.pii_output:
+            print(f"  poistetut henkilötiedot (vastaus): {r.pii_output}")
+        if r.validation_retries:
+            print(f"  validaattori pakotti korjaamaan: {r.validation_retries} kertaa")
         print(
             f"  {r.latency_s:.2f} s | {r.requests} mallikutsua | "
             f"{r.input_tokens}+{r.output_tokens} tokenia | {cost * 100:.4f} senttiä"

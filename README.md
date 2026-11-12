@@ -8,7 +8,7 @@ Tekoälyagentti kuvitteellisen lääkäriaseman asiakaspalveluun. Projektin pain
 
 - [x] Projektirunko, asetukset ja synteettinen tietopohja (12 dokumenttia)
 - [x] RAG-agentti ja työkalukutsut (PydanticAI, Azure OpenAI / AI Foundry, Chroma)
-- [ ] Guardrailit: henkilötunnusten ja yhteystietojen poisto, diagnoosipyyntöjen rajaus, lähteisiin perustuvat vastaukset
+- [x] Guardrailit: henkilötunnusten ja yhteystietojen poisto, diagnoosipyyntöjen rajaus, lähteisiin perustuvat vastaukset
 - [ ] Tracing ja kustannusseuranta (MLflow)
 - [ ] Evaluointi: oikeellisuus, lähteisiin pohjautuminen, kieltäytymisten osuvuus, viive, kustannus
 - [ ] CI: testit ja evaluoinnin laatuportti GitHub Actionsissa
@@ -37,6 +37,18 @@ Kysymys ──► PydanticAI-agentti ──► työkalu: hae_ohjeista ──► 
 - **Pilkkominen otsikoittain:** jokainen `##`-osio on oma palansa, ja siihen liitetään dokumentin pääotsikko. Haettu pala on ymmärrettävä yksinään, ja lähdeviite osoittaa oikeaan kohtaan.
 - **Rakenteinen vastaus:** `tyyppi` (vastattu / ei_tietoa / ohjattu_ammattilaiselle / hatatilanne) ja `lahteet` mahdollistavat kieltäytymisten ja lähteiden automaattisen evaluoinnin.
 - **Testattavuus:** upotusmalli on rajapinnan takana, joten testit ajetaan paikallisella korvaajalla ja PydanticAI:n TestModelilla ilman API-kutsuja.
+
+## Guardrailit
+
+| Kerros | Mitä tekee | Miksi |
+|---|---|---|
+| Syötteen pituusraja | Hylkää yli 1000 merkin viestit | Kustannusten hallinta, pitkät prompt-injektiot |
+| Henkilötietojen poisto (syöte) | Henkilötunnukset, puhelinnumerot ja sähköpostit korvataan merkinnällä ennen mallia | Henkilötiedot eivät koskaan päädy kielimallille |
+| Ohjeistus | Vastaa vain haetuista ohjeista, ei diagnooseja, hätätilanteissa 112 | Rajattu käyttötarkoitus |
+| Lähdevalidaattori | Hylkää vastauksen, jos lähde on keksitty tai "vastattu"-vastauksesta puuttuu lähde. Malli joutuu korjaamaan (ModelRetry) | Hallusinoitujen lähteiden ja perusteettomien väitteiden esto |
+| Henkilötietojen poisto (vastaus) | Sama suodatus vastaukselle, klinikan julkiset yhteystiedot sallitaan | Defense in depth |
+
+Guardrailit on löydetty kokeilemalla: varhaisessa versiossa agentti merkitsi lähteeksi olemattoman "ajanvaraus"-tiedoston ja väitti varmana, ettei katolla ole parkkihallia, vaikka ohjeissa asiaa ei mainita. Kumpikin tapaus on nyt testattu (`tests/test_guardrails.py`) ja mukana evaluointisetissä.
 
 ## Datan sijainti
 

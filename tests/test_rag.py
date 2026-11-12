@@ -6,41 +6,17 @@ deterministisesti. Agentin työkaluketju testataan PydanticAI:n TestModelilla.
 
 from __future__ import annotations
 
-import hashlib
-import math
-import re
 from datetime import date
 
-import pytest
 from pydantic_ai.models.test import TestModel
 
 from klinikka.agent import Deps, Vastaus, answer, build_agent
 from klinikka.chunking import chunk_markdown, load_chunks
 from klinikka.config import KNOWLEDGE_BASE_DIR
-from klinikka.retrieval import Retriever
 from klinikka.slots import free_slots
 
-
-class FakeEmbedder:
-    dim = 256
-
-    def embed(self, texts: list[str]) -> list[list[float]]:
-        vectors = []
-        for text in texts:
-            vec = [0.0] * self.dim
-            for word in re.findall(r"\w+", text.lower()):
-                idx = int(hashlib.md5(word.encode()).hexdigest(), 16) % self.dim
-                vec[idx] += 1.0
-            norm = math.sqrt(sum(v * v for v in vec)) or 1.0
-            vectors.append([v / norm for v in vec])
-        return vectors
-
-
-@pytest.fixture(scope="module")
-def retriever(tmp_path_factory) -> Retriever:
-    r = Retriever(FakeEmbedder(), path=tmp_path_factory.mktemp("chroma"))
-    r.rebuild(load_chunks(KNOWLEDGE_BASE_DIR))
-    return r
+# TestModel generoisi muuten satunnaiset lähteet, jotka validaattori (oikein) hylkää.
+NO_INFO = {"vastaus": "Ohjeissa ei mainita asiaa.", "tyyppi": "ei_tietoa", "lahteet": []}
 
 
 def test_chunking_splits_by_section_and_keeps_title():
@@ -72,7 +48,7 @@ def test_free_slots_are_deterministic_and_respect_opening_hours():
 
 
 def test_agent_calls_tools_and_returns_structured_answer(retriever):
-    agent = build_agent(TestModel())
+    agent = build_agent(TestModel(custom_output_args=NO_INFO))
     result = answer(agent, retriever, "Paljonko perusverenkuva maksaa?")
     assert isinstance(result.output, Vastaus)
     assert result.retrieved_sources, "agentin olisi pitänyt hakea ohjeista"
@@ -80,7 +56,7 @@ def test_agent_calls_tools_and_returns_structured_answer(retriever):
 
 
 def test_slot_tool_can_be_called_by_agent(retriever):
-    agent = build_agent(TestModel(call_tools=["tarkista_vapaat_ajat"], custom_output_args=None))
+    agent = build_agent(TestModel(call_tools=["tarkista_vapaat_ajat"], custom_output_args=NO_INFO))
     deps = Deps(retriever=retriever, today=date(2026, 11, 16))
     result = agent.run_sync("Onko vapaita aikoja?", deps=deps)
     tool_returns = [
