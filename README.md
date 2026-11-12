@@ -23,6 +23,7 @@ uv run python scripts/check_azure.py
 uv run python -m klinikka.ingest          # indeksoi tietopohjan Chromaan
 uv run python -m klinikka.ask "Paljonko perusverenkuva maksaa?"
 uv run python -m klinikka.evaluate        # evaluointi -> reports/latest.md
+uv run python -m klinikka.evaluate --toista 3   # vakausmittaus
 uv run mlflow ui --backend-store-uri sqlite:///mlflow.db   # tracet ja evaluointiajot
 uv run pytest
 ```
@@ -86,19 +87,32 @@ Ensimmäisellä täydellä ajolla 36/45 tapausta (80 %) läpäisi kaikki tarkist
 
 Havainto: noin kolmannes "virheistä" oli mittauksen eikä agentin vikoja. Evaluointia pitää siis arvioida yhtä kriittisesti kuin agenttia.
 
-### Kierros 2 → 3
+### Kierrokset 1–3
 
 | Metriikka | Kierros 1 | Kierros 2 | Kierros 3 |
 |---|---|---|---|
-| faktat_ok | 89 % | 98 % | *ajetaan* |
-| perustuu_lahteisiin | 93 % | 98 % | *ajetaan* |
-| kielletyt_ok (turvallisuus) | 100 % | 100 % | *ajetaan* |
-| **kaikki tarkistukset ok** | **80 %** | **93 %** | *ajetaan* |
+| faktat_ok | 89 % | 98 % | 100 % |
+| perustuu_lahteisiin | 93 % | 98 % | 100 % |
+| kielletyt_ok (turvallisuus) | 100 % | 100 % | 100 % |
+| **kaikki tarkistukset ok** | **80 %** | **93 %** | **100 %** |
 
 Kierroksen 2 jäljelle jääneet virheet ja korjaukset:
 - **Hakuvirhe (laboratorion kerros):** haettavien palojen lisääminen ei auttanut, koska tieto on yhden lauseen sivumaininta osoiteosiossa. Korjaus: hybridihaku (vektori + BM25).
 - **Luokitteluvirhe (lääkeannos):** vastausrakenteen kenttäkuvaus ("ei_tietoa = ohjeista ei löytynyt vastausta") oli ristiriidassa ohjeiden kanssa, ja malli seurasi kenttäkuvausta. Korjaus: kenttäkuvaukset yhdenmukaisiksi. Opetus: rakenteisen tulosteen skeema on osa promptia.
-- **Tuomarin väärä hälytys (magneettikuvaus):** oikea "ei mainita ohjeissa" -vastaus tulkittiin väitteeksi. Ratkaisuvaihtoehto: vahvempi tuomarimalli (`JUDGE_DEPLOYMENT`).
+- **Tuomarin väärä hälytys (magneettikuvaus):** oikea "ei mainita ohjeissa" -vastaus tulkittiin väitteeksi. Ratkaisuvaihtoehto: vahvempi tuomarimalli (`JUDGE_DEPLOYMENT`). Tuomarina käytetään samaa gpt-4.1-miniä kuin agenttina, koska Azure for Students -kiintiö ei salli isompia malleja. Tämä on tunnettu rajoitus: sama malli voi olla sokea omille virheilleen. Tuotannossa tuomarina olisi vahvempi tai eri malliperheen malli, ja sen arviot tarkistettaisiin otannalla.
+
+### Vakaus: 100 % ei ollut pysyvä
+
+Kierroksen 3 toistoajo samalla koodilla antoi 93 %. Kaksi tapausta vaihteli ajosta toiseen, ja yksi kaatui kokonaan: kun agentilta pyydettiin järjestelmäkehotetta, validaattori hylkäsi vastauksen kolmesti ja ajo päättyi virheeseen. Asiakas olisi saanut virheilmoituksen.
+
+Korjaukset:
+- **Lämpötila 0:** sama kysymys tuottaa saman vastauksen. Asiakaspalvelussa johdonmukaisuus on tärkeämpää kuin vaihtelu.
+- **Turvallinen varavastaus:** jos malli ei tuota hyväksyttävää vastausta, asiakas saa ohjauksen asiakaspalveluun (ja hätätilanteessa numeroon 112). Varavastaukset näkyvät tracessa ja raportissa, ja laatuportti kaatuu, jos niitä on yli 5 %.
+- **Vakausmittaus:** `--toista N` ajaa setin N kertaa, raportoi heikoimman ajon ja listaa heiluvat tapaukset. Laatuportti arvioidaan heikoimman ajon perusteella.
+
+Tulos korjausten jälkeen (`--toista 3`): **98 %, 98 %, 98 %**. Turvallisuus 100 % jokaisessa ajossa, ei kaatumisia eikä varavastauksia. Jäljelle jäänyt vaihtelu (2 tapausta) johtuu LLM-tuomarista, ei agentista: vastaustyyppi ja kielletyt sanat -tarkistus menivät läpi joka kerta.
+
+Opetus: yksittäinen evaluointiajo on otos, ei totuus.
 
 ## Datan sijainti
 

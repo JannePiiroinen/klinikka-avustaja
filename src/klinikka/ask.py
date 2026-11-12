@@ -35,6 +35,8 @@ def main() -> None:
             print(f"  poistetut henkilötiedot (syöte): {r.pii_input}")
         if r.pii_output:
             print(f"  poistetut henkilötiedot (vastaus): {r.pii_output}")
+        if r.fallback:
+            print("  VARAVASTAUS: malli ei tuottanut hyväksyttävää vastausta")
         if r.validation_retries:
             print(f"  validaattori pakotti korjaamaan: {r.validation_retries} kertaa")
         print(

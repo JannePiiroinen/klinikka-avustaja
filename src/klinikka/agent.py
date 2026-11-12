@@ -23,7 +23,7 @@ from functools import cache
 from typing import Literal
 
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent, ModelRetry, RunContext
+from pydantic_ai import Agent, ModelRetry, RunContext, UnexpectedModelBehavior
 from pydantic_ai.models import Model
 
 from klinikka import tracing
@@ -35,6 +35,15 @@ from klinikka.slots import Palvelu, free_slots
 os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
 
 BOOKING_SOURCE = "ajanvarausjärjestelmä"
+MAX_OUTPUT_RETRIES = 2
+
+# Palautetaan, jos malli ei tuota hyväksyttävää vastausta validaattorin uusintayrityksistä
+# huolimatta. Asiakas ei koskaan näe virheilmoitusta, ja tapaus näkyy tracessa ja raportissa.
+FALLBACK_ANSWER = (
+    "Pahoittelen, en pysty vastaamaan tähän kysymykseen luotettavasti. "
+    "Asiakaspalvelumme auttaa mielellään puhelimitse tai Oma Esimerkki -palvelun viestillä. "
+    "Hätätilanteessa soita 112."
+)
 
 INSTRUCTIONS = f"""\
 Olet Lääkäriasema Esimerkin tekoälyavustaja. Vastaat asiakkaiden yleisiin kysymyksiin
@@ -104,7 +113,10 @@ def build_agent(model: Model | str) -> Agent[Deps, Vastaus]:
         deps_type=Deps,
         output_type=Vastaus,
         instructions=INSTRUCTIONS,
-        retries=2,
+        retries=MAX_OUTPUT_RETRIES,
+        # Lämpötila 0: sama kysymys -> sama vastaus. Asiakaspalvelussa johdonmukaisuus on
+        # tärkeämpää kuin vaihtelu, ja evaluoinnin tulokset ovat toistettavampia.
+        model_settings={"temperature": 0.0},
     )
 
     @agent.instructions
@@ -197,6 +209,7 @@ class AnswerResult:
     pii_input: dict[str, int]
     pii_output: dict[str, int]
     trace_id: str | None
+    fallback: bool = False  # True = malli ei tuottanut hyväksyttävää vastausta
 
 
 def answer(
@@ -215,21 +228,31 @@ def answer(
 
         deps = Deps(retriever=retriever, today=today or date.today())
         start = time.perf_counter()
-        result = agent.run_sync(clean.text, deps=deps)
+        fallback = False
+        try:
+            result = agent.run_sync(clean.text, deps=deps)
+            output = result.output
+            messages = result.all_messages()
+            input_tokens, output_tokens = result.usage.input_tokens, result.usage.output_tokens
+            requests = result.usage.requests
+        except UnexpectedModelBehavior:
+            fallback = True
+            output = Vastaus(vastaus=FALLBACK_ANSWER, tyyppi="ei_tietoa", lahteet=[])
+            messages, input_tokens, output_tokens, requests = [], 0, 0, 0
         latency = time.perf_counter() - start
 
-        output = result.output
         out_clean = redact_pii(output.vastaus, allowed=_kb_public_contacts())
         output.vastaus = out_clean.text
 
         retries = sum(
             1
-            for msg in result.all_messages()
+            for msg in messages
             for part in getattr(msg, "parts", [])
             if part.part_kind == "retry-prompt" or getattr(part, "outcome", None) == "retried"
         )
-        usage = result.usage
-        cost = settings.cost_usd(usage.input_tokens, usage.output_tokens) if settings else None
+        if fallback:
+            retries = MAX_OUTPUT_RETRIES
+        cost = settings.cost_usd(input_tokens, output_tokens) if settings else None
         unique_hits = {h.chunk_id: h for h in deps.retrieved}.values()
         context = "\n\n---\n\n".join(
             [f"[lähde: {h.source}]\n{h.text}" for h in unique_hits]
@@ -241,8 +264,9 @@ def answer(
             {
                 "tyyppi": output.tyyppi,
                 "latency_s": round(latency, 3),
-                "input_tokens": usage.input_tokens,
-                "output_tokens": usage.output_tokens,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "fallback": fallback,
                 "cost_usd": cost if cost is not None else -1.0,
                 "validation_retries": retries,
                 "retrieved_sources": ",".join(sorted({h.source for h in deps.retrieved})),
@@ -254,9 +278,9 @@ def answer(
     return AnswerResult(
         question=clean.text,
         output=output,
-        input_tokens=usage.input_tokens,
-        output_tokens=usage.output_tokens,
-        requests=usage.requests,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        requests=requests,
         latency_s=latency,
         cost_usd=cost,
         retrieved_sources=sorted({h.source for h in deps.retrieved}),
@@ -265,4 +289,5 @@ def answer(
         pii_input=clean.findings,
         pii_output=out_clean.findings,
         trace_id=tracing.last_trace_id(),
+        fallback=fallback,
     )
