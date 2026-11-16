@@ -45,6 +45,21 @@ jobs:
       - name: Testit (pytest)
         run: uv run pytest -q
 
+  docker:
+    name: Docker-image
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rakenna image
+        run: docker build -t klinikka-avustaja:ci .
+
+      - name: Tarkista, että sovellus latautuu imagessa
+        run: >
+          docker run --rm --entrypoint /app/.venv/bin/python klinikka-avustaja:ci
+          -c "import klinikka.api, klinikka.mcp_server; print('ok')"
+
   evaluate:
     name: Evaluointi ja laatuportti
     needs: test

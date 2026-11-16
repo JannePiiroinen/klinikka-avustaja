@@ -1,0 +1,15 @@
+.env
+.venv
+.git
+.github
+chroma_db
+mlflow.db
+mlruns
+mlartifacts
+reports
+tests
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+*.zip

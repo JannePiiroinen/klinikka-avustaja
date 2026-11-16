@@ -1,0 +1,13 @@
+services:
+  api:
+    build: .
+    env_file: .env          # Azure-avaimet; .env ei päädy imageen eikä Gitiin
+    environment:
+      KLINIKKA_TRACING: "0" # MLflow-tracing pois kontissa (käytä paikallisesti: uv run ...)
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma:/app/chroma_db # hakuindeksi säilyy uudelleenkäynnistysten yli
+
+volumes:
+  chroma:

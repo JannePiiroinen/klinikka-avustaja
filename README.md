@@ -14,7 +14,7 @@ Tekoälyagentti kuvitteellisen lääkäriaseman asiakaspalveluun. Projektin pain
 - [x] Tracing ja kustannusseuranta (MLflow)
 - [x] Evaluointi: 45 testitapausta, deterministiset tarkistukset ja LLM-tuomari, viive ja kustannus
 - [x] CI: testit ja evaluoinnin laatuportti GitHub Actionsissa
-- [ ] FastAPI ja Docker
+- [x] REST-rajapinta (FastAPI), MCP-palvelin ja Docker
 
 ## Käyttöönotto
 
@@ -24,6 +24,8 @@ cp .env.example .env   # täytä Azure AI Foundryn tiedot
 uv run python scripts/check_azure.py
 uv run python -m klinikka.ingest          # indeksoi tietopohjan Chromaan
 uv run python -m klinikka.ask "Paljonko perusverenkuva maksaa?"
+uv run uvicorn klinikka.api:app --reload  # REST-rajapinta -> http://127.0.0.1:8000/docs
+docker compose up --build                # sama kontissa
 uv run python -m klinikka.evaluate        # evaluointi -> reports/latest.md
 uv run python -m klinikka.evaluate --toista 3   # vakausmittaus
 uv run mlflow ui --backend-store-uri sqlite:///mlflow.db   # tracet ja evaluointiajot
@@ -116,9 +118,43 @@ Tulos korjausten jälkeen (`--toista 3`): **98 %, 98 %, 98 %**. Turvallisuus 100
 
 Opetus: yksittäinen evaluointiajo on otos, ei totuus.
 
+## Käyttöliittymät: REST, MCP ja komentorivi
+
+Kaikki kolme kutsuvat samaa palvelukerrosta (`service.py`), joten guardrailit, lähdevalidaattori, varavastaus ja tracing ovat voimassa riippumatta siitä, mistä kysymys tulee.
+
+```
+Verkkosivun chat / muu järjestelmä ──► REST (FastAPI)  ─┐
+Claude Desktop / muu agentti       ──► MCP-palvelin    ─┼──► AssistantService ──► agentti + guardrailit
+Kehittäjä                          ──► komentorivi     ─┘
+```
+
+**REST-rajapinta (FastAPI).** `POST /kysy` ottaa kysymyksen ja palauttaa vastauksen, tyypin, lähteet, poistettujen henkilötietojen määrät, viiveen ja kustannuksen. Syötteen pituus validoidaan (422). `GET /health` kertoo palvelun tilan. Interaktiivinen dokumentaatio: `/docs`.
+
+```bash
+curl -X POST http://127.0.0.1:8000/kysy -H "Content-Type: application/json" \
+     -d '{"kysymys": "Pitääkö kolesterolikokeeseen olla syömättä?"}'
+```
+
+**MCP-palvelin.** Model Context Protocol on avoin standardi, jolla kielimallit käyttävät ulkoisia työkaluja ja tietolähteitä. Palvelin tarjoaa kolme työkalua: `kysy_klinikalta` (koko agentti), `hae_klinikan_ohjeista` (hybridihaku lähteineen) ja `vapaat_ajat` (ajanvaraus). Guardrailit ovat palvelimen puolella, joten ne ovat voimassa, vaikka asiakkaana olisi mikä tahansa malli.
+
+Claude Desktopissa (Settings → Developer → Edit Config):
+
+```json
+{
+  "mcpServers": {
+    "klinikka": {
+      "command": "/Users/<käyttäjä>/.local/bin/uv",
+      "args": ["--directory", "/polku/klinikka-avustaja", "run", "python", "-m", "klinikka.mcp_server"]
+    }
+  }
+}
+```
+
+**Docker.** `docker compose up --build` käynnistää REST-rajapinnan kontissa. Avaimet luetaan ajonaikaisesti `.env`-tiedostosta eivätkä päädy imageen, kontti ajetaan ilman root-oikeuksia, ja hakuindeksi rakennetaan ensimmäisellä käynnistyksellä pysyvään volyymiin. CI rakentaa imagen jokaisella pushilla.
+
 ## CI (GitHub Actions)
 
-Jokaisesta pushista ja pull requestista ajetaan lint (ruff), muotoilutarkistus ja 60 testiä. Testit eivät tarvitse API-avaimia: upotusmalli korvataan paikallisella toteutuksella ja kielimalli PydanticAI:n testimalleilla, joten guardrailit, lähdevalidaattori, varavastaus ja evaluoinnin logiikka testataan ilman kustannuksia.
+Jokaisesta pushista ja pull requestista ajetaan lint (ruff), muotoilutarkistus ja 70 testiä, ja Docker-image rakennetaan. Testit eivät tarvitse API-avaimia: upotusmalli korvataan paikallisella toteutuksella ja kielimalli PydanticAI:n testimalleilla, joten guardrailit, lähdevalidaattori, varavastaus ja evaluoinnin logiikka testataan ilman kustannuksia.
 
 Evaluointi oikeaa mallia vasten käynnistetään käsin (Actions → CI → Run workflow → *evaluate*), koska se maksaa noin 5 senttiä ajolta. Ajo käyttää `--gate`-lippua: build kaatuu, jos jokin metriikka alittaa rajansa tai yksikin turvallisuustarkistus epäonnistuu. Raportti tallentuu ajon artefaktiksi.
 
@@ -130,7 +166,7 @@ Demo käyttää Switzerland North -aluetta Azure for Students -tilauksen alueraj
 
 ```
 data/knowledge_base/   synteettinen tietopohja (markdown)
-src/klinikka/          sovelluskoodi
+src/klinikka/          sovelluskoodi (agent, guardrails, retrieval, evaluation, api, mcp_server, service)
 scripts/               apuskriptit
 tests/                 testit (ajetaan CI:ssä ilman API-avaimia)
 ```
