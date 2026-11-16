@@ -1,0 +1,83 @@
+# CI: jokaisesta pushista ja pull requestista ajetaan lint, muotoilutarkistus ja testit.
+# Testit eivät tarvitse API-avaimia (paikallinen upotuskorvaaja ja PydanticAI:n testimallit).
+#
+# Evaluointi oikeaa mallia vasten ajetaan käsin (Actions -> CI -> Run workflow), koska se
+# maksaa (~5 senttiä / ajo) ja vaatii Azure-salaisuudet. Laatuportti kaatuu, jos tulos
+# alittaa raja-arvot (ks. src/klinikka/evaluation.py).
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      evaluate:
+        description: "Aja myös evaluointi Azure OpenAI:ta vasten (vaatii salaisuudet)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint ja testit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Asenna uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Asenna riippuvuudet
+        run: uv sync --locked
+
+      - name: Lint (ruff)
+        run: uv run ruff check .
+
+      - name: Muotoilu (ruff format)
+        run: uv run ruff format --check .
+
+      - name: Testit (pytest)
+        run: uv run pytest -q
+
+  evaluate:
+    name: Evaluointi ja laatuportti
+    needs: test
+    if: github.event_name == 'workflow_dispatch' && inputs.evaluate
+    runs-on: ubuntu-latest
+    env:
+      AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+      AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+      AZURE_OPENAI_API_VERSION: "2024-10-21"
+      CHAT_DEPLOYMENT: ${{ vars.CHAT_DEPLOYMENT || 'gpt-4.1-mini' }}
+      EMBEDDING_DEPLOYMENT: ${{ vars.EMBEDDING_DEPLOYMENT || 'text-embedding-3-small' }}
+      MLFLOW_DISABLE_AGENT_HINT: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Asenna uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Asenna riippuvuudet
+        run: uv sync --locked
+
+      - name: Indeksoi tietopohja
+        run: uv run python -m klinikka.ingest
+
+      - name: Evaluointi (laatuportti)
+        run: uv run python -m klinikka.evaluate --gate
+
+      - name: Tallenna raportti
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluointiraportti
+          path: reports/
+          if-no-files-found: ignore

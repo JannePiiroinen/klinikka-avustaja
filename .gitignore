@@ -9,3 +9,5 @@ mlartifacts/
 chroma_db/
 *.egg-info/
 dist/
+mlflow.db
+*.zip
