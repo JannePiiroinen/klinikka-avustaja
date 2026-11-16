@@ -1,5 +1,7 @@
 # Klinikka-avustaja – LLMOps-demo
 
+[![CI](https://github.com/JannePiiroinen/klinikka-avustaja/actions/workflows/ci.yml/badge.svg)](https://github.com/JannePiiroinen/klinikka-avustaja/actions/workflows/ci.yml)
+
 Tekoälyagentti kuvitteellisen lääkäriaseman asiakaspalveluun. Projektin painopiste ei ole chatbotissa vaan siinä, **miten tekoälyratkaisun laatu, turvallisuus ja kustannukset todennetaan ennen tuotantoa.**
 
 > ⚠️ Kaikki aineisto on synteettistä. "Lääkäriasema Esimerkki" ja sen nimet, osoitteet, numerot ja hinnat ovat keksittyjä. Projekti ei käsittele potilastietoja.
@@ -11,7 +13,7 @@ Tekoälyagentti kuvitteellisen lääkäriaseman asiakaspalveluun. Projektin pain
 - [x] Guardrailit: henkilötunnusten ja yhteystietojen poisto, diagnoosipyyntöjen rajaus, lähteisiin perustuvat vastaukset
 - [x] Tracing ja kustannusseuranta (MLflow)
 - [x] Evaluointi: 45 testitapausta, deterministiset tarkistukset ja LLM-tuomari, viive ja kustannus
-- [ ] CI: testit ja evaluoinnin laatuportti GitHub Actionsissa
+- [x] CI: testit ja evaluoinnin laatuportti GitHub Actionsissa
 - [ ] FastAPI ja Docker
 
 ## Käyttöönotto
@@ -113,6 +115,12 @@ Korjaukset:
 Tulos korjausten jälkeen (`--toista 3`): **98 %, 98 %, 98 %**. Turvallisuus 100 % jokaisessa ajossa, ei kaatumisia eikä varavastauksia. Jäljelle jäänyt vaihtelu (2 tapausta) johtuu LLM-tuomarista, ei agentista: vastaustyyppi ja kielletyt sanat -tarkistus menivät läpi joka kerta.
 
 Opetus: yksittäinen evaluointiajo on otos, ei totuus.
+
+## CI (GitHub Actions)
+
+Jokaisesta pushista ja pull requestista ajetaan lint (ruff), muotoilutarkistus ja 60 testiä. Testit eivät tarvitse API-avaimia: upotusmalli korvataan paikallisella toteutuksella ja kielimalli PydanticAI:n testimalleilla, joten guardrailit, lähdevalidaattori, varavastaus ja evaluoinnin logiikka testataan ilman kustannuksia.
+
+Evaluointi oikeaa mallia vasten käynnistetään käsin (Actions → CI → Run workflow → *evaluate*), koska se maksaa noin 5 senttiä ajolta. Ajo käyttää `--gate`-lippua: build kaatuu, jos jokin metriikka alittaa rajansa tai yksikin turvallisuustarkistus epäonnistuu. Raportti tallentuu ajon artefaktiksi.
 
 ## Datan sijainti
 
